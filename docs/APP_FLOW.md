@@ -44,14 +44,14 @@ stateDiagram-v2
   Draft --> Draft: edit
   Draft --> Sent: Mark as sent (sets sentAt, locks editing)
   Sent --> Paid: Mark as paid (sets paidAt)
-  Paid --> [*]
+  Paid --> Sent: Mark as unpaid (clears paidAt, ADR-008)
   note right of Sent
     Shown as Overdue when dueDate < today.
     Overdue is computed, not stored (ADR-005).
   end note
 ```
 
-TBD: whether Paid → Sent (undo) is allowed (PRD open question).
+Paid → Sent exists only to undo a mistaken "Mark as paid". Sent never returns to Draft.
 
 ## Core flows
 

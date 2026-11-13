@@ -1,6 +1,6 @@
 # PRD — Freelance Invoicing & Client Tracker
 
-**Track:** Full · **Mode:** Delivery (suggested: Learning for T3 money math) · **Last updated:** 2026-11-13
+**Track:** Full · **Mode:** Delivery · **Last updated:** 2026-11-13
 
 ## Problem
 
@@ -80,6 +80,7 @@ As a freelancer, I want to mark invoices as sent and paid so that I know what is
 
 - [ ] Given a Draft invoice, when I mark it Sent, then it records `sentAt` and becomes read-only.
 - [ ] Given a Sent invoice, when I mark it Paid, then it records `paidAt` and the UI updates immediately (optimistic), rolling back with an error message if the save fails.
+- [ ] Given a Paid invoice, when I mark it unpaid, then it returns to Sent and `paidAt` is cleared.
 - [ ] Given a Sent invoice whose due date is before today, then it shows as Overdue everywhere. Overdue is computed, never stored.
 - [ ] Given the invoice list, when I filter by status, then only matching invoices show; empty filter results have their own message.
 
@@ -123,10 +124,13 @@ As a portfolio reviewer, I want the app pre-filled with realistic data so that I
 
 - None external. Stack-to-skill mapping ("What it demonstrates") from kickoff, recorded in ADR-001.
 
+## Resolved questions
+
+- Paid can be reverted to Sent to fix a mistaken payment (ADR-008).
+- Currency USD, locale `en-US` (ADR-008).
+
 ## Open questions
 
 - TBD: client fields beyond name and email (company, address, phone, notes?).
 - TBD: default payment terms for the due date (e.g. 14 or 30 days), or always pick manually?
-- TBD: can a Paid invoice be reverted to Sent (mistake fix), or is Paid final in v1?
 - TBD: dashboard totals all-time, or with a period filter (this month / year)?
-- TBD: currency and locale for formatting (e.g. EUR, `de-DE`).

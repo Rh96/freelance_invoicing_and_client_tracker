@@ -13,9 +13,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T2 — Repo, CI and deploy**
   - Acceptance: GitHub repo exists; Actions workflow runs lint, typecheck and test on PR and `main`; Vercel production and preview deploys work; live URL in README.
   - Notes: repo created; CI workflow and board done on branch `chore/t2-ci`. Vercel connected: <https://freelance-invoicing-and-client-trac.vercel.app/>. Done 2026-11-13 via PR (`chore/t2-ci`).
-- [ ] **T3 — Domain logic: money and status** _(suggested Learning mode)_
+- [x] **T3 — Domain logic: money and status** _(suggested Learning mode)_
   - Acceptance: `domain/money.ts` (line total, subtotal, tax, total, formatting) and `domain/invoice-status.ts` (overdue, allowed transitions) with unit tests covering rounding edges (e.g. 0.5 cent, quantity 1.5, 0% tax) and an injected "today".
-  - Notes: ADR-003, ADR-005. S2, S3.
+  - Notes: ADR-003, ADR-005, ADR-008. S2, S3. Done 2026-11-13 (Delivery mode).
 - [ ] **T4 — Zod schemas and repository**
   - Acceptance: `Client`/`Invoice` Zod schemas; `Repository` interface; localStorage adapter with versioned envelope, invoice number sequence, simulated latency, failure toggle; parse errors surface as a typed error. Unit tests.
   - Notes: ADR-002. S6.
@@ -54,7 +54,7 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
   - Notes: S2.
 - [ ] **T13 — Status actions with optimistic update**
   - Acceptance: Mark as sent / Mark as paid with confirm; Mark paid is optimistic with rollback on simulated failure; component test for rollback.
-  - Notes: S3. Resolve "Paid → Sent undo" open question first.
+  - Notes: S3. Includes "Mark as unpaid" (Paid → Sent, ADR-008).
 - [ ] **T14 — Print view**
   - Acceptance: `/invoices/[id]/print` with business details from config; print CSS hides chrome; a typical invoice prints on one page.
   - Notes: S4.
