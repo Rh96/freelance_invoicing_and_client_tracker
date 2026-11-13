@@ -10,9 +10,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T1 — Scaffold the project**
   - Acceptance: Next.js App Router + strict TS + Tailwind + ESLint/Prettier + Vitest/RTL set up with npm. `npm run lint`, `typecheck`, `test`, `build` all pass. Folder structure from ARCHITECTURE.md is created.
   - Notes: done 2026-11-13. Next 16.4.6; `git init` on `main` with `origin` set, nothing committed.
-- [ ] **T2 — Repo, CI and deploy**
+- [x] **T2 — Repo, CI and deploy**
   - Acceptance: GitHub repo exists; Actions workflow runs lint, typecheck and test on PR and `main`; Vercel production and preview deploys work; live URL in README.
-  - Notes: you create the repo and connect Vercel; I write the workflow. Board setup happens here too (see below).
+  - Notes: repo created; CI workflow and board done on branch `chore/t2-ci`. Vercel connected: <https://freelance-invoicing-and-client-trac.vercel.app/>. Done 2026-11-13 via PR (`chore/t2-ci`).
 - [ ] **T3 — Domain logic: money and status** _(suggested Learning mode)_
   - Acceptance: `domain/money.ts` (line total, subtotal, tax, total, formatting) and `domain/invoice-status.ts` (overdue, allowed transitions) with unit tests covering rounding edges (e.g. 0.5 cent, quantity 1.5, 0% tax) and an injected "today".
   - Notes: ADR-003, ADR-005. S2, S3.
@@ -91,15 +91,20 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 
 ## GitHub Project board
 
-Set up in T2, once the repo exists. Columns:
+Board: <https://github.com/users/Rh96/projects/4> (linked to the repo). Issue `#n` = task `Tn`.
 
-| Column     | Meaning                                                                            |
-| ---------- | ---------------------------------------------------------------------------------- |
-| **Story**  | Backlog: task issues not started, grouped by story label (`S1`–`S6`) and milestone |
-| **Tasks**  | In progress: the one task being worked on now                                      |
-| **Review** | PR open, waiting for your review and approval                                      |
-| **Done**   | Merged to `main`, CI green                                                         |
+| Column     | Meaning                                                                |
+| ---------- | ---------------------------------------------------------------------- |
+| **Story**  | Backlog: not started. Filter by story label (`S1`–`S6`) or milestone   |
+| **Tasks**  | In progress: the one task being worked on now                          |
+| **Review** | PR open, waiting for your review and approval                          |
+| **Done**   | Merged to `main`, CI green (moves automatically when the issue closes) |
 
-- Each `T<n>` becomes one issue (title, acceptance criteria as a checklist, story label, milestone).
-- Each PR closes its issue; the board moves it to Done on merge.
-- Creating issues and the board needs either the `gh` CLI (not installed yet; needs `gh auth login` with the `project` scope) or a manual import. I'll ask before creating anything on GitHub.
+Workflow per task (ADR-007):
+
+1. Move the issue to **Tasks**; work on a branch named `<type>/t<n>-<slug>` (e.g. `feat/t7-client-list`).
+2. Open a PR with `Closes #<n>` in the body; move the issue to **Review**.
+3. Merge after review and green CI; GitHub closes the issue and the board moves it to **Done**.
+4. Tick the task here in `TASKS.md` in the same PR.
+
+If tasks are added or changed here, update the matching issue (or create one) so the board stays in sync.

@@ -55,3 +55,12 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** Target Node 22 (`engines`, `@types/node@^22`). Add `noUncheckedIndexedAccess` to `tsconfig.json`. Keep the scaffold's `cacheComponents` defaults. `typecheck` runs `next typegen` first, because route types like `LayoutProps` are generated. The Vitest `@` alias is configured directly instead of adding `vite-tsconfig-paths`.
 - **Alternatives considered:** `--legacy-peer-deps` (hides the real mismatch); disabling `cacheComponents` (premature; most data is client-side via TanStack Query, revisit if it causes friction in T6).
 - **Consequences:** Indexed access (e.g. `lineItems[0]`) is typed `T | undefined`, which forces explicit handling in money and list code. CI and Vercel must run Node 22+.
+
+## ADR-007: One branch and PR per task, tracked on a GitHub Project
+
+- **Date:** 2026-11-13
+- **Status:** Accepted
+- **Context:** You want a visible board (Story | Tasks | Review | Done) and to approve each task before the next starts.
+- **Decision:** Each task `Tn` is GitHub issue `#n`, labelled with its story (`S1`–`S6`) and milestone, on the project board. Work happens on a branch per task and merges through a PR that `Closes #n`; CI (lint, type check, tests, build) must pass first. `docs/TASKS.md` stays the source of truth and the board mirrors it.
+- **Alternatives considered:** committing straight to `main` (no Review step, no CI gate); the board as the only task list (task details would live outside the repo and drift from the docs).
+- **Consequences:** Every task leaves a reviewable PR, which is good portfolio evidence. Two places to keep in sync; the PR that finishes a task also ticks it in `TASKS.md`.

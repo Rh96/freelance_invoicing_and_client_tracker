@@ -1,6 +1,10 @@
 # Freelance Invoicing & Client Tracker
 
+[![CI](https://github.com/Rh96/freelance_invoicing_and_client_tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/Rh96/freelance_invoicing_and_client_tracker/actions/workflows/ci.yml)
+
 Manage clients, build invoices with line items and tax, and see at a glance who owes you money. Portfolio project. See [`docs/PRD.md`](docs/PRD.md).
+
+**Live demo:** <https://freelance-invoicing-and-client-trac.vercel.app/>
 
 ## Getting started
 
@@ -24,4 +28,4 @@ npm run dev        # http://localhost:3000
 
 ## Docs
 
-[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [App flow](docs/APP_FLOW.md) · [Decisions](docs/DECISIONS.md) · [Tasks](docs/TASKS.md) · [Learning log](docs/LEARNING_LOG.md)
+[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [App flow](docs/APP_FLOW.md) · [Decisions](docs/DECISIONS.md) · [Tasks](docs/TASKS.md) · [Learning log](docs/LEARNING_LOG.md) · [Project board](https://github.com/users/Rh96/projects/4)

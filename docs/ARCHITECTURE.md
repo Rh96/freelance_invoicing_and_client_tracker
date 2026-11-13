@@ -79,7 +79,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 
 ## Deployment and monitoring
 
-- **Environments:** local dev; Vercel preview per PR; Vercel production from `main`.
+- **Environments:** local dev; Vercel preview per PR; Vercel production from `main` at <https://freelance-invoicing-and-client-trac.vercel.app/>.
 - **CI:** GitHub Actions on PR and `main`: `lint`, `typecheck`, `test`, `e2e`.
 - **Monitoring:** TBD. Likely Vercel Analytics only; no error tracking in v1.
 
