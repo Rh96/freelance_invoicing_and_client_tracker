@@ -43,7 +43,7 @@ function rowNames() {
 }
 
 beforeEach(() => {
-  useClientFilters.setState({ search: "" });
+  useClientFilters.setState({ search: "", showArchived: false });
 });
 
 describe("ClientList", () => {
@@ -122,6 +122,46 @@ describe("ClientList", () => {
     });
     const edit = await screen.findByRole("link", { name: "Edit Maya Chen" });
     expect(edit.getAttribute("href")).toMatch(/^\/clients\/.+\/edit$/);
+  });
+
+  it("links each name to the client's detail page", async () => {
+    renderWithProviders(<ClientList />, {
+      repository: await seedClients(testRepository()),
+    });
+    const link = await screen.findByRole("link", { name: "Maya Chen" });
+    expect(link.getAttribute("href")).toMatch(/^\/clients\/[^/]+$/);
+  });
+
+  it("shows archived clients, marked, when the toggle is on", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ClientList />, {
+      repository: await seedClients(testRepository()),
+    });
+    const toggle = await screen.findByRole("checkbox", {
+      name: "Show archived clients",
+    });
+    expect(screen.queryByRole("link", { name: "Ana Costa" })).toBeNull();
+
+    await user.click(toggle);
+    const ana = screen.getByRole("link", { name: "Ana Costa" });
+    expect(ana.closest("td")).toHaveTextContent("Archived");
+    expect(screen.getByRole("status")).toHaveTextContent("4 clients");
+  });
+
+  it("explains when every client is archived", async () => {
+    const repository = testRepository();
+    const only = await repository.createClient({
+      name: "Ana Costa",
+      email: "a@b.example",
+    });
+    await repository.archiveClient(only.id);
+    renderWithProviders(<ClientList />, { repository });
+    expect(
+      await screen.findByText(/All clients are archived/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", { name: "Show archived clients" }),
+    ).toBeInTheDocument();
   });
 
   it("shows an empty state when there are no clients", async () => {
