@@ -36,7 +36,8 @@ src/
   domain/                 # pure logic + Zod schemas: money, invoice-status, client, invoice, activity (+ tests)
   data/                   # repository.ts (interface), local-storage-repository.ts, seed.ts,
                           # repository-context.tsx (useRepository), simulate-errors.ts
-  stores/                 # Zustand UI stores
+  stores/                 # Zustand UI stores (client-filters: search)
+  test/                   # test helpers: renderWithProviders, testRepository, memoryStorage
   components/             # app-shell, app-nav, reset-demo-data-button
   components/ui/          # shadcn/ui generated components (Radix base)
   lib/utils.ts            # cn() = clsx + tailwind-merge
@@ -61,7 +62,7 @@ Money is integer cents. Tax rate is basis points (`2000` = 20%). Dates are ISO s
 Component → TanStack Query hook (features/*/queries) → Repository (async) → localStorage
 ```
 
-- **Server state** (clients, invoices): only in the TanStack Query cache. Query keys: `['clients', filters?]`, `['clients', id]`, `['invoices', filters?]`, `['invoices', id]`. Mutations invalidate the matching keys. "Mark paid" is optimistic with rollback.
+- **Server state** (clients, invoices): only in the TanStack Query cache. Query keys come from a factory per feature (`clientKeys.list()` → `['clients', 'list']`, `clientKeys.detail(id)` → `['clients', 'detail', id]`; invoices follow the same shape). Lists are fetched whole and filtered on the client (dozens of records). Mutations invalidate `clientKeys.all` / `invoiceKeys.all`. "Mark paid" is optimistic with rollback.
 - **Form state** (the invoice/client draft): owned by React Hook Form; live totals computed from `watch`ed line items via `domain/money.ts`.
 - **UI state** (search text, status filter, open dialogs): Zustand.
 - **Derived state** (totals, overdue, dashboard stats, activity): pure functions in `domain/`, called in `select` or components; never cached separately.
@@ -84,7 +85,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 ## Testing strategy
 
 - **Unit:** `domain/` (money math, rounding, status/overdue, activity), repository adapter (parse, version, seed).
-- **Component:** client list (search, empty, error), invoice form (line items, live totals, validation), mark-paid optimistic rollback.
+- **Component:** rendered with `renderWithProviders` and a real repository over in-memory storage (no mocks of our own code). Client list (loading, search, no results, empty, error + Retry, corrupt data), invoice form (line items, live totals, validation), mark-paid optimistic rollback.
 - **End-to-end:** create client → create invoice → mark sent → mark paid → dashboard totals update (Playwright, in CI).
 
 ## Deployment and monitoring
