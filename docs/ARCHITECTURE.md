@@ -36,7 +36,7 @@ src/
   domain/                 # pure logic + Zod schemas: money, invoice-status, client, invoice, activity (+ tests)
   data/                   # repository.ts (interface), local-storage-repository.ts, seed.ts,
                           # repository-context.tsx (useRepository), simulate-errors.ts
-  stores/                 # Zustand UI stores (client-filters: search)
+  stores/                 # Zustand UI stores: client-filters (search), flash (one-time message after save)
   test/                   # test helpers: renderWithProviders, testRepository, memoryStorage
   components/             # app-shell, app-nav, reset-demo-data-button
   components/ui/          # shadcn/ui generated components (Radix base)
@@ -63,7 +63,8 @@ Component → TanStack Query hook (features/*/queries) → Repository (async) �
 ```
 
 - **Server state** (clients, invoices): only in the TanStack Query cache. Query keys come from a factory per feature (`clientKeys.list()` → `['clients', 'list']`, `clientKeys.detail(id)` → `['clients', 'detail', id]`; invoices follow the same shape). Lists are fetched whole and filtered on the client (dozens of records). Mutations invalidate `clientKeys.all` / `invoiceKeys.all`. "Mark paid" is optimistic with rollback.
-- **Form state** (the invoice/client draft): owned by React Hook Form; live totals computed from `watch`ed line items via `domain/money.ts`.
+- **Form state** (the invoice/client draft): owned by React Hook Form with `zodResolver` and the domain input schema, `mode: "onTouched"` (validate on blur, then on change). Data-layer `validation` errors are mapped back onto fields with `setError`. Live invoice totals will be computed from `watch`ed line items via `domain/money.ts`.
+- **Dynamic routes** (`/clients/[id]/edit`): the page passes `params` into a `<Suspense>` boundary instead of awaiting it, because `cacheComponents` treats unknown params as request-time data. The page is a partial prerender (static shell plus the client-loaded form).
 - **UI state** (search text, status filter, open dialogs): Zustand.
 - **Derived state** (totals, overdue, dashboard stats, activity): pure functions in `domain/`, called in `select` or components; never cached separately.
 - **Repository** simulates 200–600 ms latency. Failure injection: `?simulateErrors=writes` (saves fail), `?simulateErrors=all` (everything fails), `?simulateErrors=off`; remembered per tab in sessionStorage (ADR-011).
@@ -93,6 +94,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 - **Environments:** local dev; Vercel preview per PR; Vercel production from `main` at <https://freelance-invoicing-and-client-trac.vercel.app/>.
 - **CI:** GitHub Actions on PR and `main`: `lint`, `typecheck`, `test`, `e2e`.
 - **Monitoring:** TBD. Likely Vercel Analytics only; no error tracking in v1.
+- **Bundle (measured in T8):** about 269 kB gzipped JS in total. Zod is about 33 kB of that and loads on every route via the repository; react-hook-form plus the form code is about 15 kB, on the new/edit client routes only.
 
 ## Extension path (post-MVP)
 

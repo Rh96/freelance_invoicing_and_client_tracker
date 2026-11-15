@@ -116,6 +116,14 @@ describe("ClientList", () => {
     expect(rowNames()).toEqual(["Maya Chen"]);
   });
 
+  it("links each row to its edit page with a descriptive name", async () => {
+    renderWithProviders(<ClientList />, {
+      repository: await seedClients(testRepository()),
+    });
+    const edit = await screen.findByRole("link", { name: "Edit Maya Chen" });
+    expect(edit.getAttribute("href")).toMatch(/^\/clients\/.+\/edit$/);
+  });
+
   it("shows an empty state when there are no clients", async () => {
     renderWithProviders(<ClientList />);
     expect(await screen.findByText("No clients yet.")).toBeInTheDocument();

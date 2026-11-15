@@ -16,3 +16,11 @@ export function useClients() {
     queryFn: () => repository.listClients(),
   });
 }
+
+export function useClient(id: string) {
+  const repository = useRepository();
+  return useQuery({
+    queryKey: clientKeys.detail(id),
+    queryFn: () => repository.getClient(id),
+  });
+}
