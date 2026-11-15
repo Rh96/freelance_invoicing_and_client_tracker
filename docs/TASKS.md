@@ -64,9 +64,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 
 **Goal:** the freelancer sees their money position at a glance.
 
-- [ ] **T15 — Totals and overdue list**
+- [x] **T15 — Totals and overdue list**
   - Acceptance: outstanding vs paid cards; overdue list sorted by days overdue, linking to invoices; empty and "Nothing overdue" states; selectors unit-tested.
-  - Notes: S5. Resolve "all-time vs period" open question first.
+  - Notes: S5. Done 2026-11-15. All-time totals (PRD). Overdue sorted by days overdue, then amount. Checked in headless Chrome at desktop (light) and 390px (dark) widths.
 - [ ] **T16 — Recent activity**
   - Acceptance: latest 10 events derived from timestamps via `domain/activity.ts` (unit-tested); relative times; empty state.
   - Notes: S5, ADR-005.
@@ -85,6 +85,7 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 
 ## Later / parked
 
+- Dashboard period filter (this month / this year, by payment date): not in v1; totals are all-time (decided in T15).
 - Unarchive a client: not in the PRD; archiving only hides the client and never touches invoices (decided in T9).
 - Smaller validation bundle: Zod (~33 kB gzipped) loads on every page because the repository validates stored data and lives in the root providers. Try `zod/mini` for the store schemas (measured in T8).
 
