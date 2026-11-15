@@ -76,9 +76,10 @@ Paid → Sent exists only to undo a mistaken "Mark as paid". Sent never returns 
 
 ### 4. Get paid
 
-1. Dashboard overdue list or invoice list → invoice detail → **Mark as paid**.
-2. Optimistic update: status shows Paid immediately; dashboard totals and activity reflect it after invalidation.
-3. Save fails → roll back to Sent and show an error.
+1. Dashboard overdue list or invoice list → invoice detail → **Mark as paid** → confirm.
+2. The dialog closes and the status shows Paid immediately (optimistic); focus moves to the invoice heading because the button is replaced by **Mark as unpaid**. "INV-0001 marked as paid." is announced once saved; lists, dashboard totals and activity refresh.
+3. Save fails → status rolls back to Sent and "Couldn't mark INV-0001 as paid. It's back to Sent." is shown.
+4. **Mark as unpaid** (Paid → Sent) and **Mark as sent** (Draft → Sent, locks editing) work the same way.
 
 ## Data flow
 
