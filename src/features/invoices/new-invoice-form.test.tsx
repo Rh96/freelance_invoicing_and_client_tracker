@@ -117,3 +117,28 @@ describe("NewInvoiceForm", () => {
     );
   });
 });
+
+describe("NewInvoiceForm right after creating a client", () => {
+  it("waits for the refreshed client list so the new client is preselected", async () => {
+    const { repository } = await seed();
+    const first = renderWithProviders(<NewInvoiceForm />, { repository });
+    await screen.findByRole("combobox", { name: "Client" });
+    first.unmount();
+
+    // As after "Add client" elsewhere: the cached list is invalidated while nothing shows it,
+    // so it stays stale (and lacks the new client) until something refetches it.
+    const fern = await repository.createClient({
+      name: "Fern & Co",
+      email: "f@fern.example",
+    });
+    await first.queryClient.invalidateQueries({ queryKey: ["clients"] });
+
+    renderWithProviders(<NewInvoiceForm initialClientId={fern.id} />, {
+      repository,
+      queryClient: first.queryClient,
+    });
+    expect(await screen.findByRole("combobox", { name: "Client" })).toHaveValue(
+      fern.id,
+    );
+  });
+});

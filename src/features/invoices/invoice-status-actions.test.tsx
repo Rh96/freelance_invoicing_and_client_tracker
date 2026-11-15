@@ -87,15 +87,21 @@ describe("invoice status actions", () => {
     expect(await screen.findByText("Paid")).toBeInTheDocument();
     expect(screen.queryByRole("alertdialog")).toBeNull();
     expect((await base.getInvoice(invoice.id)).status).toBe("sent");
+    // The next action waits for this save, so it can't overtake it.
+    expect(
+      screen.getByRole("button", { name: "Mark as unpaid" }),
+    ).toBeDisabled();
 
     open();
     expect(
       await screen.findByText("INV-0001 marked as paid."),
     ).toBeInTheDocument();
     expect((await base.getInvoice(invoice.id)).status).toBe("paid");
-    expect(
-      screen.getByRole("button", { name: "Mark as unpaid" }),
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Mark as unpaid" }),
+      ).toBeEnabled(),
+    );
   });
 
   it("rolls back and explains when saving fails", async () => {

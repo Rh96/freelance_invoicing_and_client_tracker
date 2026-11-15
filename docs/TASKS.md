@@ -75,9 +75,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 
 **Goal:** portfolio-ready: e2e-tested, accessible, documented.
 
-- [ ] **T17 — Playwright end-to-end flow in CI**
+- [x] **T17 — Playwright end-to-end flow in CI**
   - Acceptance: create client → invoice → sent → paid → dashboard totals updated; runs in GitHub Actions against a production build.
-  - Notes: also turn T14's manual one-page PDF check (15-line invoice, `page.pdf()`) into a Playwright test so print layout regressions fail CI.
+  - Notes: ADR-016. Done 2026-11-15. Specs: core flow, one-page print (light/dark), rollback with `?simulateErrors=writes`, edit confirmation on a preserved page. Found and fixed 3 bugs jsdom missed: status actions could overtake each other's saves; a new client wasn't preselected from a stale cached list; confirmations didn't show on pages Next keeps alive. Added `@playwright/test@~1.64.1`.
 - [ ] **T18 — Accessibility and states pass**
   - Acceptance: axe check on every route with no serious violations; full keyboard walkthrough of core flows; every screen verified for loading, empty, error and success.
 - [ ] **T19 — README case study and extension docs**

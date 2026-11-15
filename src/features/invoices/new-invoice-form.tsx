@@ -24,8 +24,15 @@ export function NewInvoiceForm({
 }) {
   const { data: clients, status, refetch, isFetching } = useClients();
   const active = useMemo(() => filterClients(clients ?? [], ""), [clients]);
+  // The form takes its defaults once, on mount. Right after "Add client", the cached list is
+  // stale (it was invalidated while no screen showed it) and lacks the new client, so wait for
+  // the refetch instead of rendering a form that can't preselect them.
+  const waitingForClient =
+    initialClientId !== undefined &&
+    isFetching &&
+    !active.some((client) => client.id === initialClientId);
 
-  if (status === "pending") {
+  if (status === "pending" || waitingForClient) {
     return (
       <div aria-busy="true" className="max-w-3xl space-y-4">
         <p role="status" className="sr-only">

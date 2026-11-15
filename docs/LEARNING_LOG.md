@@ -155,3 +155,16 @@ The agent appends one entry after every completed task. Read it weekly; turn "St
 - **What went wrong / AI got wrong:** a mutation check survived: deleting my explicit "under 60 seconds → just now" branch changed nothing, because the fallback at the end already returned "just now", and my comment had wrongly called that fallback unreachable. I removed the redundant branch and fixed the comment. Another mutation check didn't apply at first because Prettier had split the line; I re-ran it against the formatted code.
 - **Study next:** `Intl.RelativeTimeFormat` and `Intl.DateTimeFormat` options; event sourcing vs deriving state from snapshots (what an activity log would add, and cost).
 - **Interview angle:** "A mutation test showed one of my branches was dead code. The test suite was fine; the code was redundant, so I deleted it."
+
+## 2026-11-15 — T17: Playwright end-to-end tests in CI
+
+- **Built:** Playwright config (production build, system Chrome, traces on failure) and 5 specs: create client → invoice → sent → paid → dashboard; a 15-line invoice on one PDF page in light and dark themes; rollback with simulated save errors; edit confirmation on a preserved page. A second CI job runs them and uploads the report on failure. Three app bugs fixed, each with a unit test that fails on the old code. Added `@playwright/test@~1.64.1`.
+- **Concepts used:** e2e vs component tests (what each can and can't see), stale-while-revalidate (TanStack shows cached data while refetching), forms that snapshot default values, request ordering under random latency, Next 16 route preservation with React `<Activity>` (hidden DOM, paused effects), accessible-first selectors, flakiness checks with `--repeat-each`.
+- **Why this approach:** jsdom was blind to all three bugs because each needed real timing, real navigation or Next's real router. The e2e suite is small (5 tests, about 9 s) and aimed at exactly those seams.
+- **What went wrong / AI got wrong:**
+  - While planning the flow I spotted a race I had shipped in T13: with random latency, "Mark as paid" could reach storage before "Mark as sent" and be rejected; the button now waits for the previous save.
+  - The first e2e run caught a real bug: after "Add client", `/invoices/new?clientId=…` rendered from a stale cached list and couldn't preselect the new client; the form now waits for the refetch.
+  - A probe test caught another: confirmations didn't show when an edit returned to a page Next had kept alive, because `FlashMessage` only read the store on its first mount. It now reacts to the store whenever its page is visible.
+  - Two failures were selector problems: Next's route announcer is a second `role="alert"`, and hidden preserved pages still match `getByText`.
+- **Study next:** React `<Activity>` (react.dev/reference/react/Activity) and Next's "Preserving UI state" guide; TanStack Query `staleTime` / `refetchOnMount`; Playwright locator best practices.
+- **Interview angle:** "My component tests were green, but the first e2e run found three real bugs, all at the seams between the cache, the router and timing. That's the case for a small, focused e2e suite."

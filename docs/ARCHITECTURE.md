@@ -44,7 +44,7 @@ src/
   components/ui/          # shadcn/ui generated components (Radix base)
   lib/utils.ts            # cn() = clsx + tailwind-merge
   config/business.ts      # business name/address/email (fictional demo), invoice prefix and defaults, currency/locale
-e2e/                      # Playwright specs
+e2e/                      # Playwright specs (core flow, print, rollback, flash) against the production build
 ```
 
 ## Data model
@@ -84,6 +84,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 - Business rules live in `domain/` as pure, framework-free functions with unit tests.
 - Validate at boundaries: form input (Zod resolver) and data read from storage (Zod parse).
 - Cross-field Zod checks (e.g. due ≥ issue) use `when` so they still run when another field fails outright; otherwise Zod skips them and the error stays hidden.
+- Pages stay alive: Next 16 keeps up to 3 recent routes mounted but hidden (React `<Activity>`), with state preserved and effects paused while hidden. Don't rely on a component mounting fresh after navigation (react to store/query changes instead), and in e2e tests match visible text only (`filter({ visible: true })`) or use role queries.
 - Read the clock (`new Date()`, e.g. for "today" and Overdue) only in components that render after data has loaded. Static routes are prerendered, and under `cacheComponents` a clock read during prerender fails the build (it would freeze the date at build time). Only `next build` catches this, which is why CI runs it.
 - Components handle loading, empty, error and success explicitly.
 - No `any` without a comment. Named exports. Files `kebab-case`, components `PascalCase`.
@@ -93,7 +94,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 
 - **Unit:** `domain/` (money math, rounding, status/overdue, activity), repository adapter (parse, version, seed).
 - **Component:** rendered with `renderWithProviders` and a real repository over in-memory storage (no mocks of our own code). Client list (loading, search, no results, empty, error + Retry, corrupt data), invoice form (line items, live totals, validation), mark-paid optimistic rollback.
-- **End-to-end:** create client → create invoice → mark sent → mark paid → dashboard totals update (Playwright, in CI).
+- **End-to-end:** Playwright (`npm run build && npm run e2e`) against `next start` in the installed Google Chrome (`channel: "chrome"`): create client → invoice → sent → paid → dashboard totals and activity; a 15-line invoice prints on one page (light and dark); a failed Mark as paid rolls back (`?simulateErrors=writes`); editing a client shows its confirmation on the preserved detail page. Runs in CI as a second job after the checks (ADR-016).
 
 ## Deployment and monitoring
 
