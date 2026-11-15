@@ -78,8 +78,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T17 — Playwright end-to-end flow in CI**
   - Acceptance: create client → invoice → sent → paid → dashboard totals updated; runs in GitHub Actions against a production build.
   - Notes: ADR-016. Done 2026-11-15. Specs: core flow, one-page print (light/dark), rollback with `?simulateErrors=writes`, edit confirmation on a preserved page. Found and fixed 3 bugs jsdom missed: status actions could overtake each other's saves; a new client wasn't preselected from a stale cached list; confirmations didn't show on pages Next keeps alive. Added `@playwright/test@~1.64.1`.
-- [ ] **T18 — Accessibility and states pass**
+- [x] **T18 — Accessibility and states pass**
   - Acceptance: axe check on every route with no serious violations; full keyboard walkthrough of core flows; every screen verified for loading, empty, error and success.
+  - Notes: ADR-017. Done 2026-11-15. 46 axe scans (15 routes and 8 states, light and dark), 3 keyboard tests; states matrix in ARCHITECTURE. Fixed: Draft badge contrast (4.34:1 → AA); not-found and load-error screens had no `<h1>`; focus fell to `<body>` after in-page navigation (the next Tab went to the footer), now `RouteFocus`; Cancel/Escape on a status dialog sent focus to the heading instead of the trigger. Added `@axe-core/playwright@~4.14.0`. Serious + critical fail CI (decided); moderate/minor are reported (none found).
 - [ ] **T19 — README case study and extension docs**
   - Acceptance: README with live link, screenshots, stack-to-skill table, key decisions (ADR-002…005), "Reset demo data" note, and the documented path for DB + auth.
 
