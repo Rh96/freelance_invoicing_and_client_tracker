@@ -38,7 +38,8 @@ src/
                           # repository-context.tsx (useRepository), simulate-errors.ts
   stores/                 # Zustand UI stores: client-filters (search), flash (one-time message after save)
   test/                   # test helpers: renderWithProviders, testRepository, memoryStorage
-  components/             # app-shell, app-nav, reset-demo-data-button
+  components/             # app-shell, app-nav, reset-demo-data-button, flash-message,
+                          # confirm-action (shared confirm dialog), status-badge
   components/ui/          # shadcn/ui generated components (Radix base)
   lib/utils.ts            # cn() = clsx + tailwind-merge
   config/business.ts      # business name, address, invoice prefix, currency/locale

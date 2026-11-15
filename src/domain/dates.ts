@@ -1,3 +1,4 @@
+import { moneyFormat } from "@/config/business";
 import type { IsoDate } from "./invoice-status";
 
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -19,4 +20,21 @@ export function addDays(date: IsoDate, days: number): IsoDate {
   const mm = String(result.getUTCMonth() + 1).padStart(2, "0");
   const dd = String(result.getUTCDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
+}
+
+/** Formats a `YYYY-MM-DD` date for display (e.g. "Nov 15, 2026"), without time-zone shifts. */
+export function formatDate(
+  date: IsoDate,
+  locale: string = moneyFormat.locale,
+): string {
+  const match = ISO_DATE.exec(date);
+  if (!match)
+    throw new RangeError(`formatDate expects YYYY-MM-DD, got "${date}"`);
+  const [, y, m, d] = match;
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(Number(y), Number(m) - 1, Number(d))));
 }

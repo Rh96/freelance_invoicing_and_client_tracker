@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays } from "./dates";
+import { addDays, formatDate } from "./dates";
 
 describe("addDays", () => {
   it.each([
@@ -21,5 +21,20 @@ describe("addDays", () => {
     ["2026-11-15", 1.5],
   ])("rejects %j with %s days", (date, days) => {
     expect(() => addDays(date, days)).toThrow(RangeError);
+  });
+});
+
+describe("formatDate", () => {
+  it("formats in en-US by default", () => {
+    expect(formatDate("2026-11-15")).toBe("Nov 15, 2026");
+  });
+
+  it("keeps the calendar day regardless of time zone", () => {
+    expect(formatDate("2026-01-01")).toBe("Jan 1, 2026");
+    expect(formatDate("2026-12-31")).toBe("Dec 31, 2026");
+  });
+
+  it("rejects malformed dates", () => {
+    expect(() => formatDate("2026-1-1")).toThrow(RangeError);
   });
 });

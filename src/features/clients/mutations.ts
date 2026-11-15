@@ -29,3 +29,12 @@ export function useUpdateClient() {
     onSuccess: onSaved,
   });
 }
+
+export function useArchiveClient() {
+  const repository = useRepository();
+  const onSaved = useOnClientSaved();
+  return useMutation({
+    mutationFn: (id: string) => repository.archiveClient(id),
+    onSuccess: onSaved,
+  });
+}

@@ -13,12 +13,19 @@ export function ClientList() {
   const search = useClientFilters((state) => state.search);
   const setSearch = useClientFilters((state) => state.setSearch);
   const clearSearch = useClientFilters((state) => state.clearSearch);
+  const showArchived = useClientFilters((state) => state.showArchived);
+  const setShowArchived = useClientFilters((state) => state.setShowArchived);
   const searchInput = useRef<HTMLInputElement>(null);
 
-  const active = useMemo(() => filterClients(clients ?? [], ""), [clients]);
+  // `shown`: everything the toggle allows; `visible`: that, narrowed by the search.
+  const shown = useMemo(
+    () => filterClients(clients ?? [], "", { includeArchived: showArchived }),
+    [clients, showArchived],
+  );
   const visible = useMemo(
-    () => filterClients(clients ?? [], search),
-    [clients, search],
+    () =>
+      filterClients(clients ?? [], search, { includeArchived: showArchived }),
+    [clients, search, showArchived],
   );
 
   if (status === "pending") {
@@ -64,7 +71,7 @@ export function ClientList() {
     );
   }
 
-  if (active.length === 0) {
+  if (!clients || clients.length === 0) {
     return <p className="text-muted-foreground">No clients yet.</p>;
   }
 
@@ -85,13 +92,31 @@ export function ClientList() {
         />
       </div>
 
+      <div className="flex items-center gap-2">
+        <input
+          id="client-show-archived"
+          type="checkbox"
+          checked={showArchived}
+          onChange={(event) => setShowArchived(event.target.checked)}
+          className="size-4 accent-primary"
+        />
+        <label htmlFor="client-show-archived" className="text-sm">
+          Show archived clients
+        </label>
+      </div>
+
       <p role="status" className="text-sm text-muted-foreground">
-        {visible.length === active.length
-          ? `${active.length} ${active.length === 1 ? "client" : "clients"}`
-          : `${visible.length} of ${active.length} clients`}
+        {visible.length === shown.length
+          ? `${shown.length} ${shown.length === 1 ? "client" : "clients"}`
+          : `${visible.length} of ${shown.length} clients`}
       </p>
 
-      {visible.length === 0 ? (
+      {shown.length === 0 ? (
+        <p>
+          All clients are archived. Select &ldquo;Show archived clients&rdquo;
+          to see them.
+        </p>
+      ) : visible.length === 0 ? (
         <div className="space-y-3">
           <p>No clients match &ldquo;{search.trim()}&rdquo;.</p>
           <Button
@@ -128,7 +153,19 @@ export function ClientList() {
             <tbody>
               {visible.map((client) => (
                 <tr key={client.id} className="border-b last:border-0">
-                  <td className="px-3 py-2 font-medium">{client.name}</td>
+                  <td className="px-3 py-2">
+                    <Link
+                      href={`/clients/${client.id}`}
+                      className="font-medium underline-offset-4 hover:underline"
+                    >
+                      {client.name}
+                    </Link>
+                    {client.archivedAt !== null && (
+                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        Archived
+                      </span>
+                    )}
+                  </td>
                   <td className="px-3 py-2">{client.company || "—"}</td>
                   <td className="px-3 py-2">{client.email}</td>
                   <td className="px-3 py-2 text-right">

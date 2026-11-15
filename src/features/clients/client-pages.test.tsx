@@ -18,7 +18,7 @@ beforeEach(() => {
 });
 
 describe("NewClientForm", () => {
-  it("creates the client, leaves a message and returns to the list", async () => {
+  it("creates the client, leaves a message and opens its detail page", async () => {
     const user = userEvent.setup();
     const { repository } = renderWithProviders(<NewClientForm />);
 
@@ -33,8 +33,9 @@ describe("NewClientForm", () => {
     );
     await user.click(screen.getByRole("button", { name: "Add client" }));
 
+    const [jane] = await repository.listClients();
     await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith("/clients"),
+      expect(router.push).toHaveBeenCalledWith(`/clients/${jane?.id}`),
     );
     expect(useFlash.getState().message).toBe("Jane Doe added.");
     expect(await repository.listClients()).toMatchObject([
@@ -64,7 +65,7 @@ describe("NewClientForm", () => {
 });
 
 describe("EditClient", () => {
-  it("loads the client, saves changes and returns to the list", async () => {
+  it("loads the client, saves changes and returns to its detail page", async () => {
     const user = userEvent.setup();
     const repository = testRepository();
     const maya = await repository.createClient({
@@ -82,9 +83,13 @@ describe("EditClient", () => {
     await user.click(screen.getByRole("button", { name: "Save changes" }));
 
     await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith("/clients"),
+      expect(router.push).toHaveBeenCalledWith(`/clients/${maya.id}`),
     );
     expect(useFlash.getState().message).toBe("Maya Chen-Ross updated.");
+    expect(screen.getByRole("link", { name: "Cancel" })).toHaveAttribute(
+      "href",
+      `/clients/${maya.id}`,
+    );
     expect((await repository.getClient(maya.id)).name).toBe("Maya Chen-Ross");
   });
 

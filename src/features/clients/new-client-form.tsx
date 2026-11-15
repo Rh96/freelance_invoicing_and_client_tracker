@@ -17,7 +17,7 @@ export function NewClientForm() {
       onSubmit={async (data) => {
         const client = await createClient.mutateAsync(data);
         showFlash(`${client.name} added.`);
-        router.push("/clients"); // TBD (T9): go to the client detail page instead
+        router.push(`/clients/${client.id}`);
       }}
     />
   );

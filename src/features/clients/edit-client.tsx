@@ -67,11 +67,11 @@ export function EditClient({ id }: { id: string }) {
     <ClientForm
       defaultValues={client}
       submitLabel="Save changes"
-      cancelHref="/clients"
+      cancelHref={`/clients/${id}`}
       onSubmit={async (data) => {
         const saved = await updateClient.mutateAsync({ id, input: data });
         showFlash(`${saved.name} updated.`);
-        router.push("/clients"); // TBD (T9): go to the client detail page instead
+        router.push(`/clients/${id}`);
       }}
     />
   );
