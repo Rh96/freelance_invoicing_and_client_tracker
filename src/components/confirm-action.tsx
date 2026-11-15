@@ -25,6 +25,8 @@ export type ConfirmActionProps = {
   triggerLabel: string;
   triggerVariant?: ButtonProps["variant"];
   triggerSize?: ButtonProps["size"];
+  /** Disables the trigger, e.g. while a related action is still saving. */
+  triggerDisabled?: boolean;
   title: string;
   description: ReactNode;
   confirmLabel: string;
@@ -55,6 +57,7 @@ export function ConfirmAction({
   triggerLabel,
   triggerVariant = "outline",
   triggerSize,
+  triggerDisabled = false,
   title,
   description,
   confirmLabel,
@@ -102,7 +105,11 @@ export function ConfirmAction({
         }}
       >
         <AlertDialogTrigger asChild>
-          <Button variant={triggerVariant} size={triggerSize}>
+          <Button
+            variant={triggerVariant}
+            size={triggerSize}
+            disabled={triggerDisabled}
+          >
             {triggerLabel}
           </Button>
         </AlertDialogTrigger>

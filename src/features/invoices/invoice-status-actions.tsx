@@ -61,6 +61,9 @@ export function InvoiceStatusActions({
     <>
       <ConfirmAction
         mode="close-immediately"
+        // The next action appears instantly (optimistic); wait for this save to land first,
+        // or e.g. "paid" could reach the repository before "sent" and be rejected.
+        triggerDisabled={setStatus.isPending}
         returnFocusRef={headingRef}
         triggerLabel={action.label}
         triggerVariant={action.to === "paid" ? "default" : "outline"}

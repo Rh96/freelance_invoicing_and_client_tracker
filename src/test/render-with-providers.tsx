@@ -32,14 +32,19 @@ export function testRepository(
   });
 }
 
-/** Renders `ui` with a fresh QueryClient (no retries) and the given repository. */
+/** Renders `ui` with a QueryClient (fresh by default, no retries) and the given repository. */
 export function renderWithProviders(
   ui: ReactElement,
-  { repository = testRepository() }: { repository?: Repository } = {},
+  {
+    repository = testRepository(),
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    }),
+  }: { repository?: Repository; queryClient?: QueryClient } = {},
 ) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
   const view = render(
     <QueryClientProvider client={queryClient}>
       <RepositoryProvider repository={repository}>{ui}</RepositoryProvider>
