@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { demoIds, openDashboard } from "../e2e/helpers";
 
 /** Regenerates the README images from the demo data (fictional; dates relative to today). */
-const OUT = "docs/screenshots";
+const OUT = ".github/screenshots";
 
 async function settle(page: Page) {
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
