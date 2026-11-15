@@ -50,9 +50,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T11 — Invoice form: header and line items**
   - Acceptance: client picker, dates, tax rate; `useFieldArray` add/remove/edit lines; live subtotal/tax/total from `domain/money`; validation incl. due ≥ issue; component tests for totals and validation.
   - Notes: S2, ADR-013. Done 2026-11-15. Net 30 and 8.25% defaults in `src/config/business.ts`. `/invoices/new` creates a Draft and returns to the list (T12 switches to the invoice page). "New invoice" on `/invoices` and on an active client's page (`?clientId=`).
-- [ ] **T12 — Save, edit draft, read-only lock**
+- [x] **T12 — Save, edit draft, read-only lock**
   - Acceptance: create assigns the next number; edit route works only for Draft (Sent/Paid redirect to detail); invoice detail page renders line items and totals.
-  - Notes: S2.
+  - Notes: S2. Done 2026-11-15. `/invoices/[id]` and `/invoices/[id]/edit`; saves open the invoice page; invoice numbers link there from `/invoices` and client pages. The lock is enforced twice: the edit page redirects, and the repository rejects edits to non-drafts (shown in the form if it changes mid-edit).
 - [ ] **T13 — Status actions with optimistic update**
   - Acceptance: Mark as sent / Mark as paid with confirm; Mark paid is optimistic with rollback on simulated failure; component test for rollback.
   - Notes: S3. Includes "Mark as unpaid" (Paid → Sent, ADR-008).

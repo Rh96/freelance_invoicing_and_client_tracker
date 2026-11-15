@@ -6,18 +6,18 @@ How the app is used and how data moves through it. Diagrams are Mermaid and rend
 
 ## Screens and routes
 
-| Route                  | Screen         | Purpose                                            |
-| ---------------------- | -------------- | -------------------------------------------------- |
-| `/`                    | Dashboard      | Outstanding vs paid, overdue list, recent activity |
-| `/clients`             | Client list    | Search, list, archive toggle, "New client"         |
-| `/clients/new`         | New client     | Client form                                        |
-| `/clients/[id]`        | Client detail  | Details and that client's invoices                 |
-| `/clients/[id]/edit`   | Edit client    | Client form, prefilled                             |
-| `/invoices`            | Invoice list   | Status filter (Draft / Sent / Overdue / Paid)      |
-| `/invoices/new`        | New invoice    | Invoice form with line items and live totals       |
-| `/invoices/[id]`       | Invoice detail | Read-only view, status actions                     |
-| `/invoices/[id]/edit`  | Edit invoice   | Draft only; Sent/Paid redirect to detail           |
-| `/invoices/[id]/print` | Print view     | No app chrome; browser print / Save as PDF         |
+| Route                  | Screen         | Purpose                                                 |
+| ---------------------- | -------------- | ------------------------------------------------------- |
+| `/`                    | Dashboard      | Outstanding vs paid, overdue list, recent activity      |
+| `/clients`             | Client list    | Search, list, archive toggle, "New client"              |
+| `/clients/new`         | New client     | Client form                                             |
+| `/clients/[id]`        | Client detail  | Details and that client's invoices                      |
+| `/clients/[id]/edit`   | Edit client    | Client form, prefilled                                  |
+| `/invoices`            | Invoice list   | Status filter (Draft / Sent / Overdue / Paid)           |
+| `/invoices/new`        | New invoice    | Invoice form with line items and live totals            |
+| `/invoices/[id]`       | Invoice detail | Read-only view, status actions                          |
+| `/invoices/[id]/edit`  | Edit invoice   | Draft only; Sent/Paid redirect to detail with a message |
+| `/invoices/[id]/print` | Print view     | No app chrome; browser print / Save as PDF              |
 
 ## Navigation map
 
