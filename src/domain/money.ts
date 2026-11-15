@@ -107,3 +107,43 @@ export function formatMoney(
   }
   return formatter.format(cents / 100);
 }
+
+/**
+ * Converts a dollar amount typed by a user (at most 2 decimals) to integer cents.
+ * Rounding absorbs float noise: 0.29 * 100 is 28.999999999999996.
+ */
+export function dollarsToCents(dollars: number): Cents {
+  if (
+    !Number.isFinite(dollars) ||
+    dollars < 0 ||
+    !hasAtMostTwoDecimals(dollars)
+  ) {
+    throw new RangeError(
+      `dollars must be non-negative with at most 2 decimals, got ${dollars}`,
+    );
+  }
+  return Math.round(dollars * 100);
+}
+
+/** Converts a percentage typed by a user (e.g. 8.25) to basis points (825). */
+export function percentToBasisPoints(percent: number): BasisPoints {
+  if (
+    !Number.isFinite(percent) ||
+    percent < 0 ||
+    percent > 100 ||
+    !hasAtMostTwoDecimals(percent)
+  ) {
+    throw new RangeError(
+      `percent must be 0–100 with at most 2 decimals, got ${percent}`,
+    );
+  }
+  return Math.round(percent * 100);
+}
+
+export function basisPointsToPercent(bps: BasisPoints): number {
+  return bps / 100;
+}
+
+export function centsToDollars(cents: Cents): number {
+  return cents / 100;
+}

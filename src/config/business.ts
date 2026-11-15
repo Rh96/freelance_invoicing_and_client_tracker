@@ -14,3 +14,11 @@ export const invoiceNumbering = {
   prefix: "INV",
   digits: 4,
 } as const;
+
+/** Defaults for new invoices; the user can change both per invoice. */
+export const invoiceDefaults = {
+  /** Due date = issue date + this many days (Net 30). */
+  paymentTermsDays: 30,
+  /** 8.25%, in basis points. */
+  taxRateBps: 825,
+} as const;

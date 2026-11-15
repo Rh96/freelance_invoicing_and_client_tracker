@@ -4,6 +4,12 @@ import { hasAtMostTwoDecimals } from "./money";
 
 const MAX_TAX_RATE_BPS = 10_000;
 
+/** Used to decide when the "due on or after issue" check can run (see `when` below). */
+export const invoiceDatesSchema = z.object({
+  issueDate: z.iso.date(),
+  dueDate: z.iso.date(),
+});
+
 export const lineItemInputSchema = z.object({
   description: z
     .string()
@@ -46,6 +52,9 @@ export const invoiceInputSchema = z
   .refine((invoice) => invoice.dueDate >= invoice.issueDate, {
     error: "Due date must be on or after the issue date",
     path: ["dueDate"],
+    // Zod skips object-level checks when another field fails outright (e.g. an empty price);
+    // run this one as soon as both dates are valid, so the error shows alongside the others.
+    when: (payload) => invoiceDatesSchema.safeParse(payload.value).success,
   });
 
 export type LineItemInput = z.input<typeof lineItemInputSchema>;
