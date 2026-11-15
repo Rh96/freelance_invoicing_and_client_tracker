@@ -64,3 +64,21 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** Each task `Tn` is GitHub issue `#n`, labelled with its story (`S1`–`S6`) and milestone, on the project board. Work happens on a branch per task and merges through a PR that `Closes #n`; CI (lint, type check, tests, build) must pass first. `docs/TASKS.md` stays the source of truth and the board mirrors it.
 - **Alternatives considered:** committing straight to `main` (no Review step, no CI gate); the board as the only task list (task details would live outside the repo and drift from the docs).
 - **Consequences:** Every task leaves a reviewable PR, which is good portfolio evidence. Two places to keep in sync; the PR that finishes a task also ticks it in `TASKS.md`.
+
+## ADR-008: USD formatting and Paid → Sent undo
+
+- **Date:** 2026-11-13
+- **Status:** Accepted
+- **Context:** T3 needed a currency and locale for `formatMoney` and the allowed status transitions (PRD open questions).
+- **Decision:** Single currency USD formatted with `en-US`, set in `src/config/business.ts` and passed through `formatMoney`. Allowed transitions are draft → sent, sent → paid and paid → sent; the last one ("Mark as unpaid") clears `paidAt` to fix a mistaken payment. Sent never returns to Draft.
+- **Alternatives considered:** Paid as final (simpler, but a misclick would need a future "void" feature); a locale taken from the browser (totals would look different for each visitor, and printed invoices must match the business's currency conventions).
+- **Consequences:** T13 adds a "Mark as unpaid" action. An unpaid invoice past its due date immediately shows as Overdue again. Changing currency later is a one-line config change, as long as the app stays single-currency.
+
+## ADR-009: Schemas in `domain/`, one error type for the data layer
+
+- **Date:** 2026-11-15
+- **Status:** Accepted
+- **Context:** The repository and the forms (T8, T11) must validate the same input, and the UI needs to tell "fix this field" apart from "retry" and "your saved data is broken".
+- **Decision:** Zod schemas live in `src/domain/` next to the business rules, with types derived from them instead of written by hand. The repository validates every input and every read from storage. All failures are a `RepositoryError` with a `code`; `validation` errors carry `fieldErrors` keyed by path (e.g. `lineItems.0.quantity`) so forms can show them inline.
+- **Alternatives considered:** schemas in `features/*` as first planned in ARCHITECTURE.md (the data layer would import from the UI layer); hand-written TypeScript types next to the schemas (two definitions that can drift); one error class per failure (more code, and the UI only needs to switch on the code).
+- **Consequences:** One definition per entity. The UI depends on the error codes, so adding or renaming a code is a breaking change. Zod becomes the first runtime dependency; check its bundle cost when the forms ship (T8).

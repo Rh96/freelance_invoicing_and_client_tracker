@@ -29,3 +29,21 @@ The agent appends one entry after every completed task. Read it weekly; turn "St
 - **What went wrong / AI got wrong:** GitHub's API can't create board views, so the Board layout is a manual step. Vercel reads `engines: >=22` and would pick the newest Node, so the Node version is pinned in Vercel settings to match CI. Replacing the Status options would have broken the built-in "closed → Done" automation, so the script reused the existing Done option's ID.
 - **Study next:** GitHub Actions workflow syntax (`on`, `concurrency`, `permissions`); branch protection rules with required status checks.
 - **Interview angle:** "Every task is an issue, a branch and a PR gated by CI, so the repo history shows how the app was built, not just the final code."
+
+## 2026-11-13 — T3: Domain logic: money and status
+
+- **Built:** `src/domain/money.ts` (`lineTotalCents`, `invoiceTotals`, `formatMoney`), `src/domain/invoice-status.ts` (`canTransition`, `allowedTransitions`, `isOverdue`, `displayStatus`, `toIsoDate`), `src/config/business.ts` (USD, `en-US`), and 43 unit tests.
+- **Concepts used:** integer-cent arithmetic, half-up rounding, basis points, IEEE-754 float error, `as const` tuples to derive a union type (`InvoiceStatus`), lookup-table state machine (`Record<Status, Status[]>`), dependency injection of "today" for deterministic tests, `Intl.NumberFormat` caching, mutation testing by hand.
+- **Why this approach:** quantities are converted to integer hundredths before multiplying, so the only rounding is the deliberate one. Tax is rounded once on the subtotal, so three $3.33 lines at 10% give $1.00 tax, not $0.99. Domain functions throw `RangeError` on impossible input; user-facing validation belongs to Zod at the form boundary (T4/T11).
+- **What went wrong / AI got wrong:** my first "float drift" test used 1.15 × 100, which naive `Math.round` also gets right, so the test proved nothing. I found real failing inputs by brute-force search (0.29 × 50¢ = 14.5¢; naive gives 14) and confirmed the test fails against a naive implementation before keeping it.
+- **Study next:** "What Every Programmer Should Know About Floating-Point" (floating-point-gui.de); rounding modes (half-up vs banker's rounding) and when tax law dictates one.
+- **Interview angle:** "I proved my money tests were real by swapping in the naive implementation and watching them fail; the first version of the test passed either way."
+
+## 2026-11-15 — T4: Zod schemas and repository
+
+- **Built:** client and invoice Zod schemas (`src/domain/client.ts`, `invoice.ts`), the `Repository` interface and `RepositoryError` (`src/data/repository.ts`), a localStorage implementation with simulated latency and failures (`src/data/local-storage-repository.ts`), and 25 tests. Added `zod@^4.6.7`.
+- **Concepts used:** the repository pattern, `z.input` vs `z.output` (form values before defaults vs validated data), schema-derived types, a discriminated error `code`, dependency injection (storage, clock, IDs, latency), versioned persisted data, mutation testing by hand.
+- **Why this approach:** components will only ever see the `Repository` interface, so swapping localStorage for a real API later is one new file. Injecting the clock and ID generator makes every test deterministic without mocking globals.
+- **What went wrong / AI got wrong:** removing the explicit version check broke no test, because `z.literal(1)` in the schema already rejects other versions. I kept the check, because it gives a clear message and is where a future data migration will branch, and added a test that asserts the message. Another mutation check confirmed the Draft-only lock, the undo clearing `paidAt`, and the archived-client rule are each covered.
+- **Study next:** the repository pattern and ports-and-adapters (hexagonal architecture); Zod 4 `z.input`/`z.output` and `.pipe()`; how `localStorage` behaves under quota limits and in private browsing.
+- **Interview angle:** "Data access sits behind an async interface with typed error codes, so the UI already handles latency, failures and field errors before there's any backend."
