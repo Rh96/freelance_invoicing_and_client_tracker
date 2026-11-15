@@ -27,10 +27,10 @@ src/
     clients/              # list, new, [id], [id]/edit
     invoices/             # list, new, [id], [id]/edit, [id]/print
   features/
-    clients/              # components, queries (TanStack hooks), schema
-    invoices/             # components, queries, schema, form
+    clients/              # components, queries (TanStack hooks), form
+    invoices/             # components, queries, form
     dashboard/            # components, selectors (derived stats)
-  domain/                 # pure logic: money.ts, invoice-status.ts, activity.ts (+ tests)
+  domain/                 # pure logic + Zod schemas: money, invoice-status, client, invoice, activity (+ tests)
   data/                   # repository.ts (interface), local-storage-repository.ts, seed.ts
   stores/                 # Zustand UI stores
   components/ui/          # shadcn/ui generated components
@@ -42,11 +42,12 @@ e2e/                      # Playwright specs
 
 Money is integer cents. Tax rate is basis points (`2000` = 20%). Dates are ISO strings: `YYYY-MM-DD` for calendar dates, full ISO for timestamps.
 
-- `Client`: `id`, `name`, `email`, `archivedAt | null`, `createdAt`, `updatedAt`. TBD: extra fields (PRD open questions).
-- `Invoice`: `id`, `number` (`INV-0001`), `clientId`, `status: 'draft' | 'sent' | 'paid'`, `issueDate`, `dueDate`, `taxRateBps`, `lineItems: LineItem[]`, `notes?`, `createdAt`, `updatedAt`, `sentAt | null`, `paidAt | null`.
+- `Client`: `id`, `name`, `email`, `company` (may be empty), `address` (may be empty), `archivedAt | null`, `createdAt`, `updatedAt`.
+- `Invoice`: `id`, `number` (`INV-0001`), `clientId`, `status: 'draft' | 'sent' | 'paid'`, `issueDate`, `dueDate`, `taxRateBps`, `lineItems: LineItem[]` (may be empty for a Draft), `notes` (may be empty), `createdAt`, `updatedAt`, `sentAt | null`, `paidAt | null`.
 - `LineItem`: `id`, `description`, `quantity` (up to 2 decimals), `unitPriceCents`.
 - **Stored vs derived:** totals, "overdue" and the activity feed are derived and never stored (ADR-005).
-- **Storage envelope:** `{ version: number, clients: Client[], invoices: Invoice[], nextInvoiceSeq: number }` under one localStorage key, Zod-parsed on read.
+- **Storage envelope:** `{ version: 1, clients: Client[], invoices: Invoice[], nextInvoiceSeq: number }` under the localStorage key `invoice-tracker`, Zod-parsed on every read. A different version or shape is `corrupt_data` (no migrations in v1).
+- **Schemas:** `src/domain/client.ts` and `src/domain/invoice.ts` hold both the input schemas (forms and the repository validate with them) and the stored-record schemas; TypeScript types are derived with `z.input` / `z.output` (ADR-009).
 
 ## State and data flow
 
@@ -69,7 +70,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 - Validate at boundaries: form input (Zod resolver) and data read from storage (Zod parse).
 - Components handle loading, empty, error and success explicitly.
 - No `any` without a comment. Named exports. Files `kebab-case`, components `PascalCase`.
-- Error handling: the repository throws typed errors; Query surfaces them; UI shows a message plus Retry.
+- Error handling: the repository throws `RepositoryError` with a `code` (`not_found`, `invalid_state`, `validation` with `fieldErrors`, `corrupt_data`, `storage_unavailable`, `simulated_failure`); Query surfaces them; UI shows a message plus Retry, or field errors for `validation` (ADR-009).
 
 ## Testing strategy
 

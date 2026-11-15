@@ -13,12 +13,12 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T2 — Repo, CI and deploy**
   - Acceptance: GitHub repo exists; Actions workflow runs lint, typecheck and test on PR and `main`; Vercel production and preview deploys work; live URL in README.
   - Notes: repo created; CI workflow and board done on branch `chore/t2-ci`. Vercel connected: <https://freelance-invoicing-and-client-trac.vercel.app/>. Done 2026-11-13 via PR (`chore/t2-ci`).
-- [ ] **T3 — Domain logic: money and status** _(suggested Learning mode)_
+- [x] **T3 — Domain logic: money and status** _(suggested Learning mode)_
   - Acceptance: `domain/money.ts` (line total, subtotal, tax, total, formatting) and `domain/invoice-status.ts` (overdue, allowed transitions) with unit tests covering rounding edges (e.g. 0.5 cent, quantity 1.5, 0% tax) and an injected "today".
-  - Notes: ADR-003, ADR-005. S2, S3.
-- [ ] **T4 — Zod schemas and repository**
+  - Notes: ADR-003, ADR-005, ADR-008. S2, S3. Done 2026-11-13 (Delivery mode).
+- [x] **T4 — Zod schemas and repository**
   - Acceptance: `Client`/`Invoice` Zod schemas; `Repository` interface; localStorage adapter with versioned envelope, invoice number sequence, simulated latency, failure toggle; parse errors surface as a typed error. Unit tests.
-  - Notes: ADR-002. S6.
+  - Notes: ADR-002, ADR-009. S6. Done 2026-11-15. Added `zod@^4.6.7`.
 - [ ] **T5 — Demo seed and reset**
   - Acceptance: first visit seeds clients and invoices covering Draft, Sent, Overdue (relative to today) and Paid; `resetDemoData()` restores it. Tested.
   - Notes: S6.
@@ -34,7 +34,7 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
   - Notes: S1.
 - [ ] **T8 — Create and edit client**
   - Acceptance: shared RHF + Zod form with labelled inputs and field errors; create and edit mutations invalidate caches; pending and failure states keep input. Component test for validation.
-  - Notes: S1. Resolve the "client fields" open question first.
+  - Notes: S1. Fields: name, email, company, address (schema in `src/domain/client.ts`).
 - [ ] **T9 — Client detail and archive**
   - Acceptance: detail page lists the client's invoices; archive behind an accessible confirm dialog; archived clients hidden by default with a "Show archived" toggle and excluded from the invoice client picker.
   - Notes: S1.
@@ -54,7 +54,7 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
   - Notes: S2.
 - [ ] **T13 — Status actions with optimistic update**
   - Acceptance: Mark as sent / Mark as paid with confirm; Mark paid is optimistic with rollback on simulated failure; component test for rollback.
-  - Notes: S3. Resolve "Paid → Sent undo" open question first.
+  - Notes: S3. Includes "Mark as unpaid" (Paid → Sent, ADR-008).
 - [ ] **T14 — Print view**
   - Acceptance: `/invoices/[id]/print` with business details from config; print CSS hides chrome; a typical invoice prints on one page.
   - Notes: S4.
