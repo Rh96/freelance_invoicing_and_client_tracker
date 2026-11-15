@@ -8,11 +8,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     <>
       <a
         href="#main"
-        className="sr-only z-50 rounded-md bg-background px-4 py-2 font-medium focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+        className="sr-only z-50 print:hidden rounded-md bg-background px-4 py-2 font-medium focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
       >
         Skip to main content
       </a>
-      <header className="border-b">
+      <header className="border-b print:hidden">
         <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3">
           <Link href="/" className="rounded-md text-base font-semibold">
             Invoice Tracker
@@ -26,11 +26,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main
         id="main"
         tabIndex={-1}
-        className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 outline-none"
+        className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 outline-none print:max-w-none print:p-0"
       >
         {children}
       </main>
-      <footer className="border-t">
+      <footer className="border-t print:hidden">
         <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm text-muted-foreground">
           <p>Demo: data is stored only in this browser.</p>
           <ResetDemoDataButton />
