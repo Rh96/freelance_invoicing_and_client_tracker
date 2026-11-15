@@ -61,3 +61,33 @@ export function toIsoDate(date: Date): IsoDate {
   const dd = String(date.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
+
+type StatusFields = {
+  status: InvoiceStatus;
+  sentAt: string | null;
+  paidAt: string | null;
+  updatedAt: string;
+};
+
+/**
+ * Returns a copy of `invoice` moved to `to`, with the timestamps that go with it:
+ * draft → sent sets `sentAt`; → paid sets `paidAt`; paid → sent (undo) clears `paidAt`.
+ * Shared by the repository and the optimistic UI update so both follow one rule.
+ */
+export function withStatus<T extends StatusFields>(
+  invoice: T,
+  to: InvoiceStatus,
+  timestamp: string,
+): T {
+  const from = invoice.status;
+  if (!canTransition(from, to)) {
+    throw new RangeError(`Can't go from ${from} to ${to}`);
+  }
+  return {
+    ...invoice,
+    status: to,
+    updatedAt: timestamp,
+    sentAt: from === "draft" ? timestamp : invoice.sentAt,
+    paidAt: to === "paid" ? timestamp : from === "paid" ? null : invoice.paidAt,
+  };
+}
