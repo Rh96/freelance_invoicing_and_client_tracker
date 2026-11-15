@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, daysBetween, formatDate } from "./dates";
+import { addDays, daysBetween, formatDate, formatRelativeTime } from "./dates";
 
 describe("addDays", () => {
   it.each([
@@ -53,5 +53,34 @@ describe("daysBetween", () => {
 
   it("rejects malformed dates", () => {
     expect(() => daysBetween("2026-1-1", "2026-01-02")).toThrow(RangeError);
+  });
+});
+
+describe("formatRelativeTime", () => {
+  const NOW = new Date("2026-11-15T12:00:00.000Z");
+  const ago = (seconds: number) =>
+    new Date(NOW.getTime() - seconds * 1000).toISOString();
+
+  it.each([
+    [5, "just now"],
+    [59, "just now"],
+    [60, "1 minute ago"],
+    [5 * 60, "5 minutes ago"],
+    [3 * 3600, "3 hours ago"],
+    [24 * 3600, "yesterday"],
+    [2 * 24 * 3600, "2 days ago"],
+    [7 * 24 * 3600, "last week"],
+    [40 * 24 * 3600, "last month"],
+    [400 * 24 * 3600, "last year"],
+  ])("%i seconds ago → %s", (seconds, expected) => {
+    expect(formatRelativeTime(ago(seconds), NOW)).toBe(expected);
+  });
+
+  it("handles future times", () => {
+    expect(formatRelativeTime(ago(-2 * 3600), NOW)).toBe("in 2 hours");
+  });
+
+  it("rejects invalid timestamps", () => {
+    expect(() => formatRelativeTime("not a date", NOW)).toThrow(RangeError);
   });
 });

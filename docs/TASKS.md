@@ -67,9 +67,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T15 — Totals and overdue list**
   - Acceptance: outstanding vs paid cards; overdue list sorted by days overdue, linking to invoices; empty and "Nothing overdue" states; selectors unit-tested.
   - Notes: S5. Done 2026-11-15. All-time totals (PRD). Overdue sorted by days overdue, then amount. Checked in headless Chrome at desktop (light) and 390px (dark) widths.
-- [ ] **T16 — Recent activity**
+- [x] **T16 — Recent activity**
   - Acceptance: latest 10 events derived from timestamps via `domain/activity.ts` (unit-tested); relative times; empty state.
-  - Notes: S5, ADR-005.
+  - Notes: S5, ADR-005. Done 2026-11-15. Four event types (client added, invoice created, sent, paid), newest first, ties by lifecycle step; relative times with the exact time in a tooltip. Times don't tick while the page stays open.
 
 ## Milestone 5 — Polish and ship
 
