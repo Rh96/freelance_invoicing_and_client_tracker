@@ -36,7 +36,8 @@ src/
   domain/                 # pure logic + Zod schemas: money, invoice-status, client, invoice, activity (+ tests)
   data/                   # repository.ts (interface), local-storage-repository.ts, seed.ts,
                           # repository-context.tsx (useRepository), simulate-errors.ts
-  stores/                 # Zustand UI stores: client-filters (search), flash (one-time message after save)
+  stores/                 # Zustand UI stores: client-filters (search, show archived), invoice-filters (status),
+                          # flash (one-time message after save)
   test/                   # test helpers: renderWithProviders, testRepository, memoryStorage
   components/             # app-shell, app-nav, reset-demo-data-button, flash-message,
                           # confirm-action (shared confirm dialog), status-badge
@@ -80,6 +81,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 - Routes in `app/` stay thin; feature code lives in `features/<name>`.
 - Business rules live in `domain/` as pure, framework-free functions with unit tests.
 - Validate at boundaries: form input (Zod resolver) and data read from storage (Zod parse).
+- Read the clock (`new Date()`, e.g. for "today" and Overdue) only in components that render after data has loaded. Static routes are prerendered, and under `cacheComponents` a clock read during prerender fails the build (it would freeze the date at build time). Only `next build` catches this, which is why CI runs it.
 - Components handle loading, empty, error and success explicitly.
 - No `any` without a comment. Named exports. Files `kebab-case`, components `PascalCase`.
 - Error handling: the repository throws `RepositoryError` with a `code` (`not_found`, `invalid_state`, `validation` with `fieldErrors`, `corrupt_data`, `storage_unavailable`, `simulated_failure`); Query surfaces them; UI shows a message plus Retry, or field errors for `validation` (ADR-009).

@@ -44,9 +44,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 
 **Goal:** a freelancer can create, send, print and get paid on invoices.
 
-- [ ] **T10 — Invoice list with status filter**
+- [x] **T10 — Invoice list with status filter**
   - Acceptance: table (number, client, issue date, due date, total, status badge incl. Overdue); status filter via Zustand; all four states; keyboard-friendly rows/links.
-  - Notes: S3.
+  - Notes: S3. Done 2026-11-15. Filter is a native radio group with counts; Sent and Overdue are separate filters. Invoice numbers become links in T12; "New invoice" button in T11.
 - [ ] **T11 — Invoice form: header and line items**
   - Acceptance: client picker, dates, tax rate; `useFieldArray` add/remove/edit lines; live subtotal/tax/total from `domain/money`; validation incl. due ≥ issue; component tests for totals and validation.
   - Notes: S2. Resolve "default payment terms" open question first.
