@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { AppNav, AppNavFallback } from "./app-nav";
 import { ResetDemoDataButton } from "./reset-demo-data-button";
+import { RouteFocus } from "./route-focus";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -29,6 +30,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 outline-none print:max-w-none print:p-0"
       >
         {children}
+        {/* usePathname can suspend under cacheComponents on dynamic routes. */}
+        <Suspense fallback={null}>
+          <RouteFocus />
+        </Suspense>
       </main>
       <footer className="border-t print:hidden">
         <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm text-muted-foreground">

@@ -86,7 +86,8 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 - Cross-field Zod checks (e.g. due ≥ issue) use `when` so they still run when another field fails outright; otherwise Zod skips them and the error stays hidden.
 - Pages stay alive: Next 16 keeps up to 3 recent routes mounted but hidden (React `<Activity>`), with state preserved and effects paused while hidden. Don't rely on a component mounting fresh after navigation (react to store/query changes instead), and in e2e tests match visible text only (`filter({ visible: true })`) or use role queries.
 - Read the clock (`new Date()`, e.g. for "today" and Overdue) only in components that render after data has loaded. Static routes are prerendered, and under `cacheComponents` a clock read during prerender fails the build (it would freeze the date at build time). Only `next build` catches this, which is why CI runs it.
-- Components handle loading, empty, error and success explicitly.
+- Components handle loading, empty, error and success explicitly. Every screen has one `<h1>`; on detail and print screens that fail to load, the error message is the `<h1>`.
+- Focus: after a navigation that hid the control in use, focus goes to `<main>` (`RouteFocus`); a confirm dialog returns focus to its trigger on Cancel/Escape, and to `returnFocusRef` only after confirming replaces the trigger. Status colours pair a 100 background with 900 text (dark: 950/200), which keeps the badges above 4.5:1 contrast.
 - No `any` without a comment. Named exports. Files `kebab-case`, components `PascalCase`.
 - Error handling: the repository throws `RepositoryError` with a `code` (`not_found`, `invalid_state`, `validation` with `fieldErrors`, `corrupt_data`, `storage_unavailable`, `simulated_failure`); Query surfaces them; UI shows a message plus Retry, or field errors for `validation` (ADR-009).
 
@@ -95,6 +96,24 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 - **Unit:** `domain/` (money math, rounding, status/overdue, activity), repository adapter (parse, version, seed).
 - **Component:** rendered with `renderWithProviders` and a real repository over in-memory storage (no mocks of our own code). Client list (loading, search, no results, empty, error + Retry, corrupt data), invoice form (line items, live totals, validation), mark-paid optimistic rollback.
 - **End-to-end:** Playwright (`npm run build && npm run e2e`) against `next start` in the installed Google Chrome (`channel: "chrome"`): create client → invoice → sent → paid → dashboard totals and activity; a 15-line invoice prints on one page (light and dark); a failed Mark as paid rolls back (`?simulateErrors=writes`); editing a client shows its confirmation on the preserved detail page. Runs in CI as a second job after the checks (ADR-016).
+- **Accessibility:** `e2e/a11y.spec.ts` runs axe (WCAG 2.1 A/AA; serious and critical fail) on every route and on the states below, in light and dark themes; `e2e/keyboard.spec.ts` walks the core flow with the keyboard only (ADR-017).
+
+### Screen states coverage (T18)
+
+U = unit/component test, E = e2e (axe scan), M = checked by hand in T18 (skeletons last 200–600 ms, too short to assert reliably in CI). "n/a": the screen has no such state.
+
+| Screen         | Loading | Empty                                   | Error                                                    | Success              |
+| -------------- | ------- | --------------------------------------- | -------------------------------------------------------- | -------------------- |
+| Dashboard      | U       | U, E (no invoices); U (nothing overdue) | U (Retry, corrupt data), E                               | U, E                 |
+| Clients        | U       | U, E (none); U, E (no search match)     | U (Retry, corrupt data), E                               | U, E                 |
+| New client     | n/a     | n/a                                     | U (save fails, field errors), E (validation)             | U, E                 |
+| Client detail  | M       | U (no invoices)                         | U (client and invoices fail, Retry), E; U, E (not found) | U, E                 |
+| Edit client    | M       | n/a                                     | U (Retry), E; U (not found)                              | U, E (saved message) |
+| Invoices       | U       | U, E (none); U (empty filter)           | U (Retry, corrupt data), E                               | U, E                 |
+| New invoice    | M       | U (no active clients)                   | U (clients fail, Retry; save fails), E (validation)      | U, E                 |
+| Invoice detail | M       | n/a                                     | U (Retry, rolled-back status), E; U, E (not found)       | U, E                 |
+| Edit invoice   | M       | n/a                                     | U (locked once sent), E                                  | U, E                 |
+| Print          | M       | n/a                                     | U (client fails, Retry), E; U, E (not found)             | U, E                 |
 
 ## Deployment and monitoring
 

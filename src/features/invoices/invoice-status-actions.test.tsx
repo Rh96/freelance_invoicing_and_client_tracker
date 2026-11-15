@@ -137,6 +137,20 @@ describe("invoice status actions", () => {
     await waitFor(() => expect(heading()).toHaveFocus());
   });
 
+  it("returns focus to the button when the dialog is cancelled (found in T18)", async () => {
+    const user = userEvent.setup();
+    const { base, invoice } = await seed("sent");
+    renderWithProviders(<InvoiceDetail id={invoice.id} />, {
+      repository: base,
+    });
+
+    const trigger = await screen.findByRole("button", { name: "Mark as paid" });
+    await user.click(trigger);
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(screen.getByText("Sent")).toBeInTheDocument(); // nothing changed
+  });
+
   it("marks a draft as sent and locks editing", async () => {
     const user = userEvent.setup();
     const { base, invoice } = await seed("draft");

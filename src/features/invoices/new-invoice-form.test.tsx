@@ -106,6 +106,24 @@ describe("NewInvoiceForm", () => {
     ]);
   });
 
+  it("offers Retry when clients fail to load, and recovers", async () => {
+    const user = userEvent.setup();
+    let failing = true;
+    const { repository } = await seed(
+      testRepository({ shouldFail: (op) => failing && op === "listClients" }),
+    );
+    renderWithProviders(<NewInvoiceForm />, { repository });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Couldn't load clients.",
+    );
+    failing = false;
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+    expect(
+      await screen.findByRole("combobox", { name: "Client" }),
+    ).toBeInTheDocument();
+  });
+
   it("asks for a client first when there are no active clients", async () => {
     renderWithProviders(<NewInvoiceForm />);
     expect(

@@ -172,6 +172,28 @@ describe("ClientDetail", () => {
     );
   });
 
+  it("names the failure in its heading and recovers on Retry when the client fails to load", async () => {
+    const user = userEvent.setup();
+    let failing = true;
+    const repository = testRepository({
+      shouldFail: (op) => failing && op === "getClient",
+    });
+    const { maya } = await setup(repository);
+    renderWithProviders(<ClientDetail id={maya.id} />, { repository });
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Couldn't load this client.",
+      }),
+    ).toBeInTheDocument();
+    failing = false;
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Maya Chen" }),
+    ).toBeInTheDocument();
+  });
+
   it("offers Retry when invoices fail to load", async () => {
     const { maya } = await setup();
     const repository = testRepository({

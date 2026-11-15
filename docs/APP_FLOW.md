@@ -81,6 +81,14 @@ Paid → Sent exists only to undo a mistaken "Mark as paid". Sent never returns 
 3. Save fails → status rolls back to Sent and "Couldn't mark INV-0001 as paid. It's back to Sent." is shown.
 4. **Mark as unpaid** (Paid → Sent) and **Mark as sent** (Draft → Sent, locks editing) work the same way.
 
+## Keyboard and focus
+
+- **Skip link:** the first Tab shows "Skip to main content"; Enter moves focus to the page content.
+- **After navigating:** a nav link keeps focus (it's still on screen). A link or button inside the page (New client, Save draft, …) disappears with its page, so focus moves to the start of the new page's content, and the next Tab reaches its first control.
+- **Forms:** an invalid submit focuses the first invalid field; Add line item focuses the new line's description; removing a line returns focus to Add line item.
+- **Confirm dialogs:** focus starts on Cancel and stays inside the dialog; Escape or Cancel returns it to the button that opened it. Confirming a status change moves focus to the invoice heading, because that button is replaced by the next action.
+- **Status filter:** a radio group; arrow keys move between options and the focused option shows a ring.
+
 ## Data flow
 
 ```mermaid
