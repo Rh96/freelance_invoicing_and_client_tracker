@@ -130,3 +130,17 @@
     @apply outline-2 outline-offset-2 outline-ring;
   }
 }
+
+/* Printed invoices: black on white regardless of the OS theme, sensible page margins. */
+@media print {
+  :root {
+    color-scheme: light;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --muted-foreground: oklch(0.4 0 0);
+    --border: oklch(0.8 0 0);
+  }
+  @page {
+    margin: 14mm;
+  }
+}

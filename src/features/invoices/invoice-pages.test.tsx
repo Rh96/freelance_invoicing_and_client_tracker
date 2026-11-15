@@ -89,6 +89,10 @@ describe("InvoiceDetail", () => {
       "href",
       `/invoices/${invoice.id}/edit`,
     );
+    expect(screen.getByRole("link", { name: "Print" })).toHaveAttribute(
+      "href",
+      `/invoices/${invoice.id}/print`,
+    );
     view.unmount();
 
     await repository.setInvoiceStatus(invoice.id, "sent");

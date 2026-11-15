@@ -100,6 +100,9 @@ function LoadedInvoice({ invoice }: { invoice: Invoice }) {
               <Link href={`/invoices/${invoice.id}/edit`}>Edit</Link>
             </Button>
           )}
+          <Button variant="outline" asChild>
+            <Link href={`/invoices/${invoice.id}/print`}>Print</Link>
+          </Button>
           <InvoiceStatusActions invoice={invoice} headingRef={heading} />
         </div>
       </div>

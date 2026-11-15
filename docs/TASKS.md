@@ -56,9 +56,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T13 — Status actions with optimistic update**
   - Acceptance: Mark as sent / Mark as paid with confirm; Mark paid is optimistic with rollback on simulated failure; component test for rollback.
   - Notes: S3, ADR-014. Includes "Mark as unpaid" (Paid → Sent, ADR-008). Done 2026-11-15. All three actions are optimistic; one transition rule (`withStatus`) shared by repository and UI.
-- [ ] **T14 — Print view**
+- [x] **T14 — Print view**
   - Acceptance: `/invoices/[id]/print` with business details from config; print CSS hides chrome; a typical invoice prints on one page.
-  - Notes: S4.
+  - Notes: S4, ADR-015. Done 2026-11-15. Fictional business "Harbor & Pine Studio" in `src/config/business.ts`. Verified in headless Chrome: a 15-line invoice prints on one Letter page, black on white in both light and dark OS themes (the first version needed 2 pages and was tightened).
 
 ## Milestone 4 — Dashboard
 
@@ -77,6 +77,7 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 
 - [ ] **T17 — Playwright end-to-end flow in CI**
   - Acceptance: create client → invoice → sent → paid → dashboard totals updated; runs in GitHub Actions against a production build.
+  - Notes: also turn T14's manual one-page PDF check (15-line invoice, `page.pdf()`) into a Playwright test so print layout regressions fail CI.
 - [ ] **T18 — Accessibility and states pass**
   - Acceptance: axe check on every route with no serious violations; full keyboard walkthrough of core flows; every screen verified for loading, empty, error and success.
 - [ ] **T19 — README case study and extension docs**
