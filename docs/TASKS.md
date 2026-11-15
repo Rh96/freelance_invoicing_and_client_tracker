@@ -81,8 +81,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T18 — Accessibility and states pass**
   - Acceptance: axe check on every route with no serious violations; full keyboard walkthrough of core flows; every screen verified for loading, empty, error and success.
   - Notes: ADR-017. Done 2026-11-15. 46 axe scans (15 routes and 8 states, light and dark), 3 keyboard tests; states matrix in ARCHITECTURE. Fixed: Draft badge contrast (4.34:1 → AA); not-found and load-error screens had no `<h1>`; focus fell to `<body>` after in-page navigation (the next Tab went to the footer), now `RouteFocus`; Cancel/Escape on a status dialog sent focus to the heading instead of the trigger. Added `@axe-core/playwright@~4.14.0`. Serious + critical fail CI (decided); moderate/minor are reported (none found).
-- [ ] **T19 — README case study and extension docs**
+- [x] **T19 — README case study and extension docs**
   - Acceptance: README with live link, screenshots, stack-to-skill table, key decisions (ADR-002…005), "Reset demo data" note, and the documented path for DB + auth.
+  - Notes: Done 2026-11-15. README rewritten as a case study (also ADR-014 and the testing story); 5 screenshots in `docs/screenshots`, regenerated with `npm run screenshots` (Playwright, not in CI); `docs/EXTENSIONS.md` for database, auth and importing browser data. The README doesn't describe how the project was built (decided).
 
 ## Later / parked
 

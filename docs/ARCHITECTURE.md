@@ -125,4 +125,5 @@ U = unit/component test, E = e2e (axe scan), M = checked by hand in T18 (skeleto
 ## Extension path (post-MVP)
 
 - **Database:** implement `Repository` over route handlers + a hosted DB (e.g. Postgres); swap the adapter; components unchanged.
-- **Auth:** TBD provider; add `userId` ownership to `Client` and `Invoice`. Documented as a separate ADR when started.
+- **Auth:** provider decided in its own ADR; `owner_id` on every record, checked in every route handler.
+- The full plan (schema, routes, error mapping, contract tests, import of browser data, order of work) is in [EXTENSIONS.md](EXTENSIONS.md).
