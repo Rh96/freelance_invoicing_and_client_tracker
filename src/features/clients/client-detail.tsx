@@ -42,7 +42,7 @@ export function ClientDetail({ id }: { id: string }) {
       <div role="alert" className="max-w-lg space-y-3 rounded-md border p-4">
         {notFound ? (
           <>
-            <p>This client doesn&apos;t exist.</p>
+            <h1 className="font-semibold">This client doesn&apos;t exist.</h1>
             <Link
               href="/clients"
               className="font-medium underline underline-offset-4"
@@ -52,7 +52,7 @@ export function ClientDetail({ id }: { id: string }) {
           </>
         ) : (
           <>
-            <p>Couldn&apos;t load this client.</p>
+            <h1 className="font-semibold">Couldn&apos;t load this client.</h1>
             <Button
               variant="outline"
               size="sm"

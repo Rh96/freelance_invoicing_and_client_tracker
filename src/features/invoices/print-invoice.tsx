@@ -17,7 +17,7 @@ export function PrintInvoice({ id }: { id: string }) {
     const notFound = isRepositoryError(error) && error.code === "not_found";
     return notFound ? (
       <LoadError>
-        <p>This invoice doesn&apos;t exist.</p>
+        <h1 className="font-semibold">This invoice doesn&apos;t exist.</h1>
         <Link
           href="/invoices"
           className="font-medium underline underline-offset-4"
@@ -27,7 +27,7 @@ export function PrintInvoice({ id }: { id: string }) {
       </LoadError>
     ) : (
       <LoadError>
-        <p>Couldn&apos;t load this invoice.</p>
+        <h1 className="font-semibold">Couldn&apos;t load this invoice.</h1>
         <RetryButton retrying={isFetching} onRetry={() => void refetch()} />
       </LoadError>
     );
@@ -48,7 +48,9 @@ function PrintableInvoice({ invoice }: { invoice: Invoice }) {
   if (status === "error") {
     return (
       <LoadError>
-        <p>Couldn&apos;t load this invoice&apos;s client.</p>
+        <h1 className="font-semibold">
+          Couldn&apos;t load this invoice&apos;s client.
+        </h1>
         <RetryButton retrying={isFetching} onRetry={() => void refetch()} />
       </LoadError>
     );

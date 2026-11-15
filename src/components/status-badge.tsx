@@ -2,7 +2,12 @@ import type { DisplayStatus } from "@/domain/invoice-status";
 import { cn } from "@/lib/utils";
 
 const STYLES: Record<DisplayStatus, { label: string; className: string }> = {
-  draft: { label: "Draft", className: "bg-muted text-muted-foreground" },
+  draft: {
+    label: "Draft",
+    // Same shade pairing as the others; muted-on-muted was 4.34:1, under AA (found in T18).
+    className:
+      "bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200",
+  },
   sent: {
     label: "Sent",
     className: "bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-200",

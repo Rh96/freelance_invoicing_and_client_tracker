@@ -45,7 +45,7 @@ export function InvoiceDetail({ id }: { id: string }) {
       <div role="alert" className="max-w-lg space-y-3 rounded-md border p-4">
         {notFound ? (
           <>
-            <p>This invoice doesn&apos;t exist.</p>
+            <h1 className="font-semibold">This invoice doesn&apos;t exist.</h1>
             <Link
               href="/invoices"
               className="font-medium underline underline-offset-4"
@@ -55,7 +55,7 @@ export function InvoiceDetail({ id }: { id: string }) {
           </>
         ) : (
           <>
-            <p>Couldn&apos;t load this invoice.</p>
+            <h1 className="font-semibold">Couldn&apos;t load this invoice.</h1>
             <Button
               variant="outline"
               size="sm"

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useRef,
   useState,
   type ComponentProps,
   type ReactNode,
@@ -42,7 +43,10 @@ export type ConfirmActionProps = {
    * shows the outcome, since the result is already on screen and this button may be replaced.
    */
   mode?: "wait" | "close-immediately";
-  /** Where focus goes when the dialog closes; use it when the trigger may disappear. */
+  /**
+   * Where focus goes when the dialog closes after confirming; use it when confirming may
+   * replace the trigger. Cancel and Escape still return focus to the trigger.
+   */
   returnFocusRef?: RefObject<HTMLElement | null>;
   onConfirm: () => Promise<unknown>;
 };
@@ -72,9 +76,12 @@ export function ConfirmAction({
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const pending = status === "pending";
+  // Set just before a confirm closes the dialog; Cancel/Escape leave it false.
+  const confirmed = useRef(false);
 
   async function confirm() {
     if (mode === "close-immediately") {
+      confirmed.current = true;
       setOpen(false);
       try {
         await onConfirm();
@@ -87,6 +94,7 @@ export function ConfirmAction({
     setStatus("pending");
     try {
       await onConfirm();
+      confirmed.current = true;
       setOpen(false);
       setStatus("done");
     } catch {
@@ -115,9 +123,11 @@ export function ConfirmAction({
         </AlertDialogTrigger>
         <AlertDialogContent
           onCloseAutoFocus={(event) => {
-            if (!returnFocusRef?.current) return; // default: back to the trigger
+            const target = confirmed.current ? returnFocusRef?.current : null;
+            confirmed.current = false;
+            if (!target) return; // default: back to the trigger
             event.preventDefault();
-            returnFocusRef.current.focus();
+            target.focus();
           }}
         >
           <AlertDialogHeader>

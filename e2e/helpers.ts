@@ -39,3 +39,28 @@ export async function confirmAction(page: Page, label: string) {
     .getByRole("button", { name: label })
     .click();
 }
+
+type StoredDemo = {
+  clients: { id: string; archivedAt: string | null }[];
+  invoices: { id: string; status: string; dueDate: string }[];
+};
+
+/** IDs from the seeded demo data (generated at random), for routes that need one. */
+export async function demoIds(page: Page) {
+  const ids = await page.evaluate(() => {
+    const store = JSON.parse(
+      localStorage.getItem("invoice-tracker") ?? "null",
+    ) as StoredDemo | null;
+    const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD, local
+    return {
+      client: store?.clients.find((c) => c.archivedAt === null)?.id,
+      draft: store?.invoices.find((i) => i.status === "draft")?.id,
+      overdue: store?.invoices.find(
+        (i) => i.status === "sent" && i.dueDate < today,
+      )?.id,
+    };
+  });
+  const { client, draft, overdue } = ids;
+  if (!client || !draft || !overdue) throw new Error("Demo data not seeded");
+  return { client, draft, overdue };
+}
