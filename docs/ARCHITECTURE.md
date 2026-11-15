@@ -40,7 +40,7 @@ src/
                           # flash (one-time message after save)
   test/                   # test helpers: renderWithProviders, testRepository, memoryStorage
   components/             # app-shell, app-nav, reset-demo-data-button, flash-message,
-                          # confirm-action (shared confirm dialog), status-badge
+                          # confirm-action (shared confirm dialog), status-badge, form-field
   components/ui/          # shadcn/ui generated components (Radix base)
   lib/utils.ts            # cn() = clsx + tailwind-merge
   config/business.ts      # business name, address, invoice prefix, currency/locale
@@ -65,7 +65,7 @@ Component → TanStack Query hook (features/*/queries) → Repository (async) �
 ```
 
 - **Server state** (clients, invoices): only in the TanStack Query cache. Query keys come from a factory per feature (`clientKeys.list()` → `['clients', 'list']`, `clientKeys.detail(id)` → `['clients', 'detail', id]`; invoices follow the same shape). Lists are fetched whole and filtered on the client (dozens of records). Mutations invalidate `clientKeys.all` / `invoiceKeys.all`. "Mark paid" is optimistic with rollback.
-- **Form state** (the invoice/client draft): owned by React Hook Form with `zodResolver` and the domain input schema, `mode: "onTouched"` (validate on blur, then on change). Data-layer `validation` errors are mapped back onto fields with `setError`. Live invoice totals will be computed from `watch`ed line items via `domain/money.ts`.
+- **Form state** (the invoice/client draft): owned by React Hook Form with `zodResolver` and the domain input schema, `mode: "onTouched"` (validate on blur, then on change). Data-layer `validation` errors are mapped back onto fields with `setError`. The invoice form edits dollars and percent (`src/features/invoices/invoice-form-schema.ts`) and converts to cents and basis points on submit; live totals use `useWatch` and `previewTotals()`, which treats half-typed numbers as $0 (ADR-013). Labels, errors and ARIA wiring come from the shared `FormField`.
 - **Dynamic routes** (`/clients/[id]/edit`): the page passes `params` into a `<Suspense>` boundary instead of awaiting it, because `cacheComponents` treats unknown params as request-time data. The page is a partial prerender (static shell plus the client-loaded form).
 - **UI state** (search text, status filter, open dialogs): Zustand.
 - **Derived state** (totals, overdue, dashboard stats, activity): pure functions in `domain/`, called in `select` or components; never cached separately.
@@ -81,6 +81,7 @@ See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 - Routes in `app/` stay thin; feature code lives in `features/<name>`.
 - Business rules live in `domain/` as pure, framework-free functions with unit tests.
 - Validate at boundaries: form input (Zod resolver) and data read from storage (Zod parse).
+- Cross-field Zod checks (e.g. due ≥ issue) use `when` so they still run when another field fails outright; otherwise Zod skips them and the error stays hidden.
 - Read the clock (`new Date()`, e.g. for "today" and Overdue) only in components that render after data has loaded. Static routes are prerendered, and under `cacheComponents` a clock read during prerender fails the build (it would freeze the date at build time). Only `next build` catches this, which is why CI runs it.
 - Components handle loading, empty, error and success explicitly.
 - No `any` without a comment. Named exports. Files `kebab-case`, components `PascalCase`.

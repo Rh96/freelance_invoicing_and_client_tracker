@@ -47,9 +47,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T10 — Invoice list with status filter**
   - Acceptance: table (number, client, issue date, due date, total, status badge incl. Overdue); status filter via Zustand; all four states; keyboard-friendly rows/links.
   - Notes: S3. Done 2026-11-15. Filter is a native radio group with counts; Sent and Overdue are separate filters. Invoice numbers become links in T12; "New invoice" button in T11.
-- [ ] **T11 — Invoice form: header and line items**
+- [x] **T11 — Invoice form: header and line items**
   - Acceptance: client picker, dates, tax rate; `useFieldArray` add/remove/edit lines; live subtotal/tax/total from `domain/money`; validation incl. due ≥ issue; component tests for totals and validation.
-  - Notes: S2. Resolve "default payment terms" open question first.
+  - Notes: S2, ADR-013. Done 2026-11-15. Net 30 and 8.25% defaults in `src/config/business.ts`. `/invoices/new` creates a Draft and returns to the list (T12 switches to the invoice page). "New invoice" on `/invoices` and on an active client's page (`?clientId=`).
 - [ ] **T12 — Save, edit draft, read-only lock**
   - Acceptance: create assigns the next number; edit route works only for Draft (Sent/Paid redirect to detail); invoice detail page renders line items and totals.
   - Notes: S2.

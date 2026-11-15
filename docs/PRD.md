@@ -130,9 +130,9 @@ As a portfolio reviewer, I want the app pre-filled with realistic data so that I
 - Currency USD, locale `en-US` (ADR-008).
 - Client fields: name and email (required, email validated), company and address (optional). The address is used for "Bill to" on the printed invoice.
 - Drafts may have zero line items; totals show $0.00.
+- New invoices default to Net 30 (due date = issue date + 30 days, following the issue date until the user changes it) and 8.25% tax; both are editable per invoice and set in `src/config/business.ts`.
 - The invoice list's status filters match the badges and don't overlap: "Sent" means sent and not yet past due; overdue invoices are only under "Overdue". Counts add up to "All".
 
 ## Open questions
 
-- TBD: default payment terms for the due date (e.g. 14 or 30 days), or always pick manually?
 - TBD: dashboard totals all-time, or with a period filter (this month / year)?

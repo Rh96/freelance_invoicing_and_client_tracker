@@ -109,3 +109,12 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** React Hook Form validates on blur, then on every change once a field has been touched (`mode: "onTouched"`), and on submit; errors are linked with `aria-describedby` and focus moves to the first invalid field. After saving, the app returns to `/clients` and shows a one-time message ("Jane Doe added.") from a small Zustand store. The message is rendered into an already-present `aria-live` region one frame after mount, so screen readers announce it.
 - **Alternatives considered:** validating on every keystroke from the start (errors appear while the user is still typing); a toast library such as sonner (one more dependency for one message); the message in the URL (`?added=…` survives reloads and can be spoofed with arbitrary text).
 - **Consequences:** No new UI dependency. T9 switches the destination to the client detail page; `FlashMessage` can be reused on any page.
+
+## ADR-013: Invoice form edits dollars and percent; cross-field checks always run
+
+- **Date:** 2026-11-15
+- **Status:** Accepted
+- **Context:** The domain stores integer cents and basis points (ADR-003), but people type "$12.50" and "8.25%". Separately, Zod skips object-level refinements (such as due ≥ issue) whenever another field fails outright, for example an empty price, so the date error stayed hidden until everything else was valid.
+- **Decision:** The invoice form has its own schema in dollars and percent. On submit, `toInvoiceInput` converts with `dollarsToCents` / `percentToBasisPoints`, after the shared ≤2-decimal rule has been checked, and the repository re-validates with the domain schema. Field errors coming back from the repository are mapped onto the form's field names (`toFormField`). Live totals reuse the domain money functions and treat half-typed values as $0. Both the form and the domain schemas give the date check `when: dates are valid`, so it reports alongside other errors.
+- **Alternatives considered:** asking users for cents and basis points (unusable); storing dollars as decimals (brings back float errors, ADR-003); a money input library (a new dependency for one conversion); `superRefine` (has the same skip behaviour).
+- **Consequences:** Two schemas describe an invoice (form units and domain units) and must stay aligned; `toFormField` is the single mapping point, and it has tests. Number inputs use `valueAsNumber`, so an empty field is `NaN` and shows "Enter a …".
