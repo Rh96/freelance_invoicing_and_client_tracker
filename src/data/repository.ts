@@ -22,6 +22,9 @@ export interface Repository {
   updateInvoice(id: string, input: InvoiceInput): Promise<Invoice>;
   /** Moves along an allowed transition and records `sentAt` / `paidAt`. */
   setInvoiceStatus(id: string, to: InvoiceStatus): Promise<Invoice>;
+
+  /** Replaces all data with the starting data (the demo seed in the app). Works on corrupt data too. */
+  resetData(): Promise<void>;
 }
 
 export type RepositoryErrorCode =

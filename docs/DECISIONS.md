@@ -82,3 +82,12 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** Zod schemas live in `src/domain/` next to the business rules, with types derived from them instead of written by hand. The repository validates every input and every read from storage. All failures are a `RepositoryError` with a `code`; `validation` errors carry `fieldErrors` keyed by path (e.g. `lineItems.0.quantity`) so forms can show them inline.
 - **Alternatives considered:** schemas in `features/*` as first planned in ARCHITECTURE.md (the data layer would import from the UI layer); hand-written TypeScript types next to the schemas (two definitions that can drift); one error class per failure (more code, and the UI only needs to switch on the code).
 - **Consequences:** One definition per entity. The UI depends on the error codes, so adding or renaming a code is a breaking change. Zod becomes the first runtime dependency; check its bundle cost when the forms ship (T8).
+
+## ADR-010: Demo seed relative to today, saved on first read
+
+- **Date:** 2026-11-15
+- **Status:** Accepted
+- **Context:** The live demo must show every invoice status, including overdue, whenever someone opens it, and visitors need a way back to a clean state (S6).
+- **Decision:** `createSeedStore({ now })` builds the demo data with every date and timestamp relative to `now`. The repository takes it as `initialData`, saves it on the first read so ids stay stable across reloads, and `resetData()` writes a fresh one without reading the old data, which also recovers from corrupt storage. `resetData()` is part of the `Repository` interface.
+- **Alternatives considered:** fixed dates (every Sent invoice slowly turns overdue and the dashboard ages); seeding outside the repository in app code (two places that know about first-visit logic); a separate demo-only reset service (the UI would need a second dependency for one button).
+- **Consequences:** A returning visitor keeps the dates from their first visit, so their data ages until they reset; acceptable for a demo. A real backend would implement `resetData()` as "delete my data" or not offer it.

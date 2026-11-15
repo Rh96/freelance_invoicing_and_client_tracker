@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { createSeedStore } from "./seed";
 import type { InvoiceInput } from "@/domain/invoice";
 import {
   createLocalStorageRepository,
@@ -355,5 +356,66 @@ describe("simulation", () => {
     const start = performance.now();
     await slow.listClients();
     expect(performance.now() - start).toBeGreaterThanOrEqual(25);
+  });
+});
+
+describe("initial data and reset", () => {
+  const seeded = () =>
+    makeRepo({
+      initialData: () =>
+        createSeedStore({
+          now: new Date("2026-11-15T10:00:00.000Z"),
+          generateId: sequentialIds(),
+        }),
+    });
+
+  it("saves the initial data on first read, so ids stay stable", async () => {
+    const first = await seeded().listClients();
+    expect(first.length).toBeGreaterThan(0);
+    expect(storage.data.has(DEFAULT_STORAGE_KEY)).toBe(true);
+    // A second instance reads what was saved instead of seeding again.
+    const again = await makeRepo().listClients();
+    expect(again.map((c) => c.id)).toEqual(first.map((c) => c.id));
+  });
+
+  it("continues invoice numbering after the seeded invoices", async () => {
+    const repo = seeded();
+    const [client] = (await repo.listClients()).filter(
+      (c) => c.archivedAt === null,
+    );
+    const invoice = await repo.createInvoice(invoiceInput(client!.id));
+    expect(invoice.number).toBe("INV-0009");
+  });
+
+  it("restores the initial data after changes", async () => {
+    const repo = seeded();
+    const before = await repo.listInvoices();
+    await repo.setInvoiceStatus(
+      before.find((i) => i.status === "draft")!.id,
+      "sent",
+    );
+    await repo.createClient(ACME);
+
+    await repo.resetData();
+
+    expect(
+      (await repo.listInvoices()).map((i) => [i.number, i.status]),
+    ).toEqual(before.map((i) => [i.number, i.status]));
+    expect((await repo.listClients()).some((c) => c.name === ACME.name)).toBe(
+      false,
+    );
+  });
+
+  it("recovers from corrupt stored data", async () => {
+    storage.data.set(DEFAULT_STORAGE_KEY, "{not json");
+    const repo = seeded();
+    await expectRepoError(repo.listClients(), "corrupt_data");
+    await repo.resetData();
+    expect((await repo.listClients()).length).toBeGreaterThan(0);
+  });
+
+  it("can fail like any other call (demo error states)", async () => {
+    const flaky = makeRepo({ shouldFail: (op) => op === "resetData" });
+    await expectRepoError(flaky.resetData(), "simulated_failure");
   });
 });

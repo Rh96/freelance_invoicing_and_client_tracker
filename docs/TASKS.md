@@ -19,9 +19,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T4 — Zod schemas and repository**
   - Acceptance: `Client`/`Invoice` Zod schemas; `Repository` interface; localStorage adapter with versioned envelope, invoice number sequence, simulated latency, failure toggle; parse errors surface as a typed error. Unit tests.
   - Notes: ADR-002, ADR-009. S6. Done 2026-11-15. Added `zod@^4.6.7`.
-- [ ] **T5 — Demo seed and reset**
+- [x] **T5 — Demo seed and reset**
   - Acceptance: first visit seeds clients and invoices covering Draft, Sent, Overdue (relative to today) and Paid; `resetDemoData()` restores it. Tested.
-  - Notes: S6.
+  - Notes: S6, ADR-010. Done 2026-11-15. Implemented as `createSeedStore()` plus `Repository.resetData()`; the app wires the seed in T6.
 - [ ] **T6 — App shell and providers**
   - Acceptance: QueryClient provider, layout with semantic nav (Dashboard, Clients, Invoices), skip link, visible focus styles, shadcn/ui base set up; error boundary for routes; works by keyboard only.
 

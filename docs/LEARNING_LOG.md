@@ -47,3 +47,12 @@ The agent appends one entry after every completed task. Read it weekly; turn "St
 - **What went wrong / AI got wrong:** removing the explicit version check broke no test, because `z.literal(1)` in the schema already rejects other versions. I kept the check, because it gives a clear message and is where a future data migration will branch, and added a test that asserts the message. Another mutation check confirmed the Draft-only lock, the undo clearing `paidAt`, and the archived-client rule are each covered.
 - **Study next:** the repository pattern and ports-and-adapters (hexagonal architecture); Zod 4 `z.input`/`z.output` and `.pipe()`; how `localStorage` behaves under quota limits and in private browsing.
 - **Interview angle:** "Data access sits behind an async interface with typed error codes, so the UI already handles latency, failures and field errors before there's any backend."
+
+## 2026-11-15 — T5: Demo seed and reset
+
+- **Built:** `src/data/seed.ts` (5 clients, 1 archived; 8 invoices covering Draft, Sent, Overdue and Paid, all relative to today), `src/domain/dates.ts` (`addDays`), first-visit seeding through the repository's `initialData` option, `Repository.resetData()`, and 27 tests.
+- **Concepts used:** relative test fixtures, UTC date math to avoid daylight-saving bugs, idempotent initialization (save on first read), property-style tests (the same assertions at two different "today"s), the reserved `.example` domain for fake emails.
+- **Why this approach:** the seed is a pure function of `now`, so it's testable and never goes stale. Saving it on first read matters: otherwise every read would generate new random ids and links would break between page loads.
+- **What went wrong / AI got wrong:** the seed first built invoice numbers by hand (`INV-` + padding), duplicating the repository's rule; it now reuses the exported `formatInvoiceNumber`. Mutation checks confirmed tests catch three regressions: not saving the seed, fixed instead of relative dates, and a reset that reads corrupt data first.
+- **Study next:** date handling without libraries (`Date.UTC`, local vs UTC calendar dates) and when to reach for Temporal; test fixtures vs factories.
+- **Interview angle:** "The demo data is generated relative to today and tested at two different dates, so the live demo never goes stale."

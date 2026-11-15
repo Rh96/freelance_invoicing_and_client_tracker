@@ -19,7 +19,7 @@ import { RepositoryError, type Repository } from "./repository";
 export const STORE_VERSION = 1;
 export const DEFAULT_STORAGE_KEY = "invoice-tracker";
 
-const storeSchema = z.object({
+export const storeSchema = z.object({
   version: z.literal(STORE_VERSION),
   clients: z.array(clientSchema),
   invoices: z.array(invoiceSchema),
@@ -41,6 +41,11 @@ export type LocalStorageRepositoryOptions = {
   shouldFail?: (operation: string) => boolean;
   now?: () => Date;
   generateId?: () => string;
+  /**
+   * Data to start from when nothing is stored yet, and what `resetData()` restores.
+   * Saved on first read so ids stay stable. Defaults to an empty store; the app passes the demo seed.
+   */
+  initialData?: () => Store;
 };
 
 export function emptyStore(): Store {
@@ -52,7 +57,7 @@ export function emptyStore(): Store {
   };
 }
 
-function formatInvoiceNumber(seq: number): string {
+export function formatInvoiceNumber(seq: number): string {
   return `${invoiceNumbering.prefix}-${String(seq).padStart(invoiceNumbering.digits, "0")}`;
 }
 
@@ -87,6 +92,7 @@ export function createLocalStorageRepository(
     shouldFail = () => false,
     now = () => new Date(),
     generateId = () => crypto.randomUUID(),
+    initialData = emptyStore,
   } = options;
 
   function getStorage(): KeyValueStorage {
@@ -104,7 +110,11 @@ export function createLocalStorageRepository(
 
   function readStore(): Store {
     const raw = getStorage().getItem(storageKey);
-    if (raw === null) return emptyStore();
+    if (raw === null) {
+      const store = initialData();
+      writeStore(store);
+      return store;
+    }
 
     let json: unknown;
     try {
@@ -315,6 +325,12 @@ export function createLocalStorageRepository(
         invoice.updatedAt = timestamp;
         writeStore(store);
         return invoice;
+      }),
+
+    resetData: () =>
+      run("resetData", () => {
+        // Never reads the old data, so it also recovers from corrupt storage.
+        writeStore(initialData());
       }),
   };
 }
