@@ -53,9 +53,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T12 — Save, edit draft, read-only lock**
   - Acceptance: create assigns the next number; edit route works only for Draft (Sent/Paid redirect to detail); invoice detail page renders line items and totals.
   - Notes: S2. Done 2026-11-15. `/invoices/[id]` and `/invoices/[id]/edit`; saves open the invoice page; invoice numbers link there from `/invoices` and client pages. The lock is enforced twice: the edit page redirects, and the repository rejects edits to non-drafts (shown in the form if it changes mid-edit).
-- [ ] **T13 — Status actions with optimistic update**
+- [x] **T13 — Status actions with optimistic update**
   - Acceptance: Mark as sent / Mark as paid with confirm; Mark paid is optimistic with rollback on simulated failure; component test for rollback.
-  - Notes: S3. Includes "Mark as unpaid" (Paid → Sent, ADR-008).
+  - Notes: S3, ADR-014. Includes "Mark as unpaid" (Paid → Sent, ADR-008). Done 2026-11-15. All three actions are optimistic; one transition rule (`withStatus`) shared by repository and UI.
 - [ ] **T14 — Print view**
   - Acceptance: `/invoices/[id]/print` with business details from config; print CSS hides chrome; a typical invoice prints on one page.
   - Notes: S4.

@@ -13,7 +13,11 @@ import {
   type InvoiceData,
   type InvoiceInput,
 } from "@/domain/invoice";
-import { canTransition, type InvoiceStatus } from "@/domain/invoice-status";
+import {
+  canTransition,
+  withStatus,
+  type InvoiceStatus,
+} from "@/domain/invoice-status";
 import { RepositoryError, type Repository } from "./repository";
 
 export const STORE_VERSION = 1;
@@ -316,15 +320,10 @@ export function createLocalStorageRepository(
             `Invoice ${invoice.number} can't go from ${invoice.status} to ${to}`,
           );
         }
-        const timestamp = now().toISOString();
-        if (to === "sent" && invoice.status === "draft")
-          invoice.sentAt = timestamp;
-        if (to === "paid") invoice.paidAt = timestamp;
-        if (to === "sent" && invoice.status === "paid") invoice.paidAt = null; // undo (ADR-008)
-        invoice.status = to;
-        invoice.updatedAt = timestamp;
+        const updated = withStatus(invoice, to, now().toISOString());
+        store.invoices[store.invoices.indexOf(invoice)] = updated;
         writeStore(store);
-        return invoice;
+        return updated;
       }),
 
     resetData: () =>

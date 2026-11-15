@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { isRepositoryError } from "@/data/repository";
@@ -14,6 +15,7 @@ import {
   lineTotalCents,
 } from "@/domain/money";
 import { useClient } from "@/features/clients/queries";
+import { InvoiceStatusActions } from "./invoice-status-actions";
 import { useInvoice } from "./queries";
 
 export function InvoiceDetail({ id }: { id: string }) {
@@ -76,20 +78,29 @@ function LoadedInvoice({ invoice }: { invoice: Invoice }) {
   const { data: client } = useClient(invoice.clientId);
   const today = toIsoDate(new Date());
   const totals = invoiceTotals(invoice.lineItems, invoice.taxRateBps);
+  const heading = useRef<HTMLHeadingElement>(null);
 
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold">{invoice.number}</h1>
+          {/* tabIndex -1: focus target after a status change replaces the clicked button. */}
+          <h1
+            ref={heading}
+            tabIndex={-1}
+            className="text-2xl font-semibold outline-none"
+          >
+            {invoice.number}
+          </h1>
           <StatusBadge status={displayStatus(invoice, today)} />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           {invoice.status === "draft" && (
             <Button variant="outline" asChild>
               <Link href={`/invoices/${invoice.id}/edit`}>Edit</Link>
             </Button>
           )}
+          <InvoiceStatusActions invoice={invoice} headingRef={heading} />
         </div>
       </div>
 

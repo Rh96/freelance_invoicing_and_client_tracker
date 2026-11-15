@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, type ComponentProps, type ReactNode } from "react";
+import {
+  useState,
+  type ComponentProps,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,11 +29,19 @@ export type ConfirmActionProps = {
   description: ReactNode;
   confirmLabel: string;
   pendingLabel: string;
-  /** Shown inside the dialog when `onConfirm` throws; the dialog stays open. */
-  errorMessage: string;
-  /** Announced to screen readers after success. */
-  successMessage: string;
+  /** "wait" mode: shown inside the dialog when `onConfirm` throws; the dialog stays open. */
+  errorMessage?: string;
+  /** Announced to screen readers after success (when this component still exists). */
+  successMessage?: string;
   destructive?: boolean;
+  /**
+   * "wait" (default): the dialog stays open until the action finishes, and shows errors.
+   * "close-immediately": for optimistic actions. The dialog closes on confirm; the caller
+   * shows the outcome, since the result is already on screen and this button may be replaced.
+   */
+  mode?: "wait" | "close-immediately";
+  /** Where focus goes when the dialog closes; use it when the trigger may disappear. */
+  returnFocusRef?: RefObject<HTMLElement | null>;
   onConfirm: () => Promise<unknown>;
 };
 
@@ -49,6 +62,8 @@ export function ConfirmAction({
   errorMessage,
   successMessage,
   destructive = false,
+  mode = "wait",
+  returnFocusRef,
   onConfirm,
 }: ConfirmActionProps) {
   const [open, setOpen] = useState(false);
@@ -56,6 +71,16 @@ export function ConfirmAction({
   const pending = status === "pending";
 
   async function confirm() {
+    if (mode === "close-immediately") {
+      setOpen(false);
+      try {
+        await onConfirm();
+        setStatus("done");
+      } catch {
+        setStatus("idle"); // the caller reports the failure
+      }
+      return;
+    }
     setStatus("pending");
     try {
       await onConfirm();
@@ -81,7 +106,13 @@ export function ConfirmAction({
             {triggerLabel}
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent
+          onCloseAutoFocus={(event) => {
+            if (!returnFocusRef?.current) return; // default: back to the trigger
+            event.preventDefault();
+            returnFocusRef.current.focus();
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>{title}</AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>
@@ -106,9 +137,11 @@ export function ConfirmAction({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <p role="status" className="sr-only">
-        {status === "done" ? successMessage : ""}
-      </p>
+      {successMessage !== undefined && (
+        <p role="status" className="sr-only">
+          {status === "done" ? successMessage : ""}
+        </p>
+      )}
     </>
   );
 }
