@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { isRepositoryError } from "@/data/repository";
@@ -119,6 +120,9 @@ export function ClientList() {
                 <th scope="col" className="px-3 py-2 font-medium">
                   Email
                 </th>
+                <th scope="col" className="px-3 py-2">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -127,6 +131,15 @@ export function ClientList() {
                   <td className="px-3 py-2 font-medium">{client.name}</td>
                   <td className="px-3 py-2">{client.company || "—"}</td>
                   <td className="px-3 py-2">{client.email}</td>
+                  <td className="px-3 py-2 text-right">
+                    <Link
+                      href={`/clients/${client.id}/edit`}
+                      aria-label={`Edit ${client.name}`}
+                      className="rounded-sm font-medium underline underline-offset-4"
+                    >
+                      Edit
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
