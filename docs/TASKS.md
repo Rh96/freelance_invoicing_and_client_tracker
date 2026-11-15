@@ -22,8 +22,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T5 — Demo seed and reset**
   - Acceptance: first visit seeds clients and invoices covering Draft, Sent, Overdue (relative to today) and Paid; `resetDemoData()` restores it. Tested.
   - Notes: S6, ADR-010. Done 2026-11-15. Implemented as `createSeedStore()` plus `Repository.resetData()`; the app wires the seed in T6.
-- [ ] **T6 — App shell and providers**
-  - Acceptance: QueryClient provider, layout with semantic nav (Dashboard, Clients, Invoices), skip link, visible focus styles, shadcn/ui base set up; error boundary for routes; works by keyboard only.
+- [x] **T6 — App shell and providers**
+  - Acceptance: QueryClient provider, layout with semantic nav (Dashboard, Clients, Invoices), skip link, visible focus styles, shadcn/ui base set up; error boundary for routes; works by keyboard only. Added: "Reset demo data" button with confirm dialog (S6).
+  - Notes: ADR-011. Done 2026-11-15.
 
 ## Milestone 2 — Clients
 
