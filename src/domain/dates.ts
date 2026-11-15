@@ -38,3 +38,15 @@ export function formatDate(
     timeZone: "UTC",
   }).format(new Date(Date.UTC(Number(y), Number(m) - 1, Number(d))));
 }
+
+/** Whole calendar days from `from` to `to` (negative if `to` is earlier). Time-zone safe. */
+export function daysBetween(from: IsoDate, to: IsoDate): number {
+  const toUtc = (date: IsoDate) => {
+    const match = ISO_DATE.exec(date);
+    if (!match)
+      throw new RangeError(`daysBetween expects YYYY-MM-DD, got "${date}"`);
+    const [, y, m, d] = match;
+    return Date.UTC(Number(y), Number(m) - 1, Number(d));
+  };
+  return Math.round((toUtc(to) - toUtc(from)) / 86_400_000);
+}

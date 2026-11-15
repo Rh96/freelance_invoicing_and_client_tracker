@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, formatDate } from "./dates";
+import { addDays, daysBetween, formatDate } from "./dates";
 
 describe("addDays", () => {
   it.each([
@@ -36,5 +36,22 @@ describe("formatDate", () => {
 
   it("rejects malformed dates", () => {
     expect(() => formatDate("2026-1-1")).toThrow(RangeError);
+  });
+});
+
+describe("daysBetween", () => {
+  it.each([
+    ["2026-11-15", "2026-11-15", 0],
+    ["2026-11-10", "2026-11-15", 5],
+    ["2026-11-15", "2026-11-10", -5],
+    ["2026-12-31", "2027-01-01", 1],
+    ["2028-02-28", "2028-03-01", 2], // leap year
+    ["2026-03-07", "2026-03-09", 2], // across US daylight-saving start
+  ])("%s → %s is %i days", (from, to, days) => {
+    expect(daysBetween(from, to)).toBe(days);
+  });
+
+  it("rejects malformed dates", () => {
+    expect(() => daysBetween("2026-1-1", "2026-01-02")).toThrow(RangeError);
   });
 });
