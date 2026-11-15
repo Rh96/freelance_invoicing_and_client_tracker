@@ -60,6 +60,7 @@ Component → TanStack Query hook (features/*/queries) → Repository (async) �
 - **UI state** (search text, status filter, open dialogs): Zustand.
 - **Derived state** (totals, overdue, dashboard stats, activity): pure functions in `domain/`, called in `select` or components; never cached separately.
 - **Repository** simulates 200–600 ms latency. Failure injection is switchable (`?simulateErrors=1` or a dev toggle) to demo error states.
+- **Demo seed:** `createSeedStore()` (`src/data/seed.ts`) builds 5 clients (1 archived) and 8 invoices with dates relative to today. The app passes it as the repository's `initialData`; it's saved on the first read, and `resetData()` restores a fresh one (ADR-010).
 
 See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.
 
