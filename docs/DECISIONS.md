@@ -127,3 +127,12 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** `withStatus(invoice, to, timestamp)` in `src/domain/invoice-status.ts` is the only implementation of a transition and its timestamps; the repository and the optimistic cache update both call it. `useSetInvoiceStatus` cancels in-flight invoice queries, snapshots the detail and list caches, applies `withStatus` to the freshest cached copy, rolls back on error and invalidates on settle. `ConfirmAction` gained `mode="close-immediately"` (the dialog closes on confirm; the caller reports the outcome) and `returnFocusRef` (focus goes to the invoice heading, since the clicked button is replaced). All three status actions use it.
 - **Alternatives considered:** optimistic for "paid" only, as the acceptance criteria literally say (inconsistent feel between actions); non-optimistic with a pending dialog (slower, and the simulated latency makes it obvious); computing the optimistic invoice separately in the UI (two transition rules that can drift).
 - **Consequences:** Success is announced only after the save, while the UI changed before it, so the announcement trails the visual by the latency. Cancelling in-flight queries guards a race that jsdom can't reproduce reliably, so it has no test.
+
+## ADR-015: Print view with print CSS inside the app shell
+
+- **Date:** 2026-11-15
+- **Status:** Accepted
+- **Context:** S4 needs a clean printable invoice ("Save as PDF" replaces email sending). The app shell (header, nav, footer) wraps every route in the root layout.
+- **Decision:** `/invoices/[id]/print` stays inside the shell. On screen it shows a Back link, a "Print / Save as PDF" button and the invoice document; when printing, Tailwind's `print:hidden` removes the shell and toolbar, and a `@media print` block forces light colors (so a dark OS theme still prints black on white) and sets `@page` margins. The business shown is fictional ("Harbor & Pine Studio", `.example` email), because the demo is public.
+- **Alternatives considered:** a route group with its own layout so the print page has no shell even on screen (cleaner preview, but it moves every route file); a PDF library (a dependency, and the browser already does this well).
+- **Consequences:** The print preview on screen still shows the app header. Print layout can't be tested in jsdom; it was verified with headless Chrome (one Letter page for 15 lines, light and dark), and T17 will automate that check.
