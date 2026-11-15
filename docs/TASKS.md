@@ -30,9 +30,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 
 **Goal:** a freelancer can manage their client list end to end.
 
-- [ ] **T7 — Client list with search**
+- [x] **T7 — Client list with search**
   - Acceptance: list from `useClients`; search via Zustand (name, company, email); loading skeleton, empty, no-results, error + Retry states; component tests for each state.
-  - Notes: S1.
+  - Notes: S1. Done 2026-11-15. Added `zustand@~5.0.16` (5.1.0 was 9 days old). Archived clients hidden; names become links in T9; "New client" button in T8.
 - [ ] **T8 — Create and edit client**
   - Acceptance: shared RHF + Zod form with labelled inputs and field errors; create and edit mutations invalidate caches; pending and failure states keep input. Component test for validation.
   - Notes: S1. Fields: name, email, company, address (schema in `src/domain/client.ts`).

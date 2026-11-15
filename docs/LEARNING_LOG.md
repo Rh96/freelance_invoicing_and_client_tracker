@@ -65,3 +65,12 @@ The agent appends one entry after every completed task. Read it weekly; turn "St
 - **What went wrong / AI got wrong:** `shadcn init` silently changed four things: Base UI by default, a new `cn` package, the `shadcn` CLI as a dependency, and class-based dark mode. I caught it by diffing `package.json` and `globals.css` after the run and reverted to the approved setup (ADR-011). Next 16 renamed the error boundary prop from `reset` to `retry`; I took that from the bundled docs instead of memory.
 - **Study next:** WAI-ARIA landmarks and the alert dialog pattern (w3.org/WAI/ARIA/apg/patterns/alertdialog); React Query's `QueryClient` defaults and `invalidateQueries`.
 - **Interview angle:** "I treat code generators like dependencies: I diff what they change. shadcn quietly swapped in an unapproved package, and I caught it before it shipped."
+
+## 2026-11-15 — T7: Client list with search
+
+- **Built:** `/clients` with a searchable table (`src/features/clients/client-list.tsx`), `useClients()` and the `clientKeys` factory (`queries.ts`), `filterClients()`, a Zustand store for the search text (`src/stores/client-filters.ts`), shared test helpers (`src/test/render-with-providers.tsx`), and 16 tests. Added `zustand@~5.0.16`.
+- **Concepts used:** query key factories, the `status` union from `useQuery` (`pending` / `error` / `success`), Zustand selectors (subscribe to one field so unrelated changes don't re-render), `role="status"` live regions for result counts, `aria-busy`, focus management after "Clear search", testing with a real in-memory repository instead of mocks.
+- **Why this approach:** search lives in Zustand, not component state, so it survives navigating away and back (a test covers this). Filtering happens on the client because the whole list is already cached and small; a server-side search would add a query per keystroke for no gain.
+- **What went wrong / AI got wrong:** the seed already contains an archived client, so hiding archived clients had to happen in T7 rather than waiting for T9's toggle. My smoke-test shutdown (`pkill`/`pgrep -f`) matched its own shell and left a `next start` server running; it's now stopped by the PID that owns the port.
+- **Study next:** TanStack Query "Effective React Query Keys" (tkdodo.eu/blog/effective-react-query-keys); Zustand selectors and `useShallow`.
+- **Interview angle:** "Component tests use the real data layer over in-memory storage, so they catch integration bugs that mocks would hide, and they still run in milliseconds."
