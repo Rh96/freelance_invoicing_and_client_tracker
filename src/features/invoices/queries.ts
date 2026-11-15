@@ -16,3 +16,11 @@ export function useInvoices() {
     queryFn: () => repository.listInvoices(),
   });
 }
+
+export function useInvoice(id: string) {
+  const repository = useRepository();
+  return useQuery({
+    queryKey: invoiceKeys.detail(id),
+    queryFn: () => repository.getInvoice(id),
+  });
+}

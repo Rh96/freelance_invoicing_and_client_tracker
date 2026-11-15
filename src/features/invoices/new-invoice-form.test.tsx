@@ -71,7 +71,7 @@ describe("NewInvoiceForm", () => {
     );
   });
 
-  it("saves a draft, leaves a message and returns to the list", async () => {
+  it("saves a draft, leaves a message and opens the invoice page", async () => {
     const user = userEvent.setup();
     const { repository, maya } = await seed();
     renderWithProviders(<NewInvoiceForm initialClientId={maya.id} />, {
@@ -89,9 +89,9 @@ describe("NewInvoiceForm", () => {
     );
     await user.click(screen.getByRole("button", { name: "Save draft" }));
 
-    await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith("/invoices"),
-    );
+    await vi.waitFor(() => expect(router.push).toHaveBeenCalled());
+    const [invoice] = await repository.listInvoices();
+    expect(router.push).toHaveBeenCalledWith(`/invoices/${invoice?.id}`);
     expect(useFlash.getState().message).toBe("INV-0001 saved as draft.");
     expect(await repository.listInvoices()).toMatchObject([
       {

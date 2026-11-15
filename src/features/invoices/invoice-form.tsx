@@ -98,6 +98,11 @@ export function InvoiceForm({
         );
         if (fieldErrors.length > 0) return;
       }
+      if (isRepositoryError(error) && error.code === "invalid_state") {
+        // e.g. the invoice was sent from another tab while this form was open.
+        setFormError(`${error.message}.`);
+        return;
+      }
       setFormError("Couldn't save the invoice. Please try again.");
     }
   });

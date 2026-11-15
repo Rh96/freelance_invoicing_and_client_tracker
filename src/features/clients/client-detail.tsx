@@ -190,8 +190,14 @@ function ClientInvoices({ clientId }: { clientId: string }) {
             <tbody>
               {rows.map((invoice) => (
                 <tr key={invoice.id} className="border-b last:border-0">
-                  {/* TBD (T12): link to the invoice page */}
-                  <td className="px-3 py-2 font-medium">{invoice.number}</td>
+                  <td className="px-3 py-2 font-medium">
+                    <Link
+                      href={`/invoices/${invoice.id}`}
+                      className="underline-offset-4 hover:underline"
+                    >
+                      {invoice.number}
+                    </Link>
+                  </td>
                   <td className="px-3 py-2">{formatDate(invoice.issueDate)}</td>
                   <td className="px-3 py-2">{formatDate(invoice.dueDate)}</td>
                   <td className="px-3 py-2 text-right tabular-nums">

@@ -1,6 +1,12 @@
 import { z } from "zod";
-import { invoiceDatesSchema, type InvoiceInput } from "@/domain/invoice";
 import {
+  invoiceDatesSchema,
+  type Invoice,
+  type InvoiceInput,
+} from "@/domain/invoice";
+import {
+  basisPointsToPercent,
+  centsToDollars,
   dollarsToCents,
   hasAtMostTwoDecimals,
   invoiceTotals,
@@ -82,6 +88,22 @@ export function toInvoiceInput(data: InvoiceFormData): InvoiceInput {
       description: item.description,
       quantity: item.quantity,
       unitPriceCents: dollarsToCents(item.unitPrice),
+    })),
+  };
+}
+
+/** The reverse of `toInvoiceInput`, for editing a saved invoice. */
+export function toFormValues(invoice: Invoice): InvoiceFormValues {
+  return {
+    clientId: invoice.clientId,
+    issueDate: invoice.issueDate,
+    dueDate: invoice.dueDate,
+    taxRatePercent: basisPointsToPercent(invoice.taxRateBps),
+    notes: invoice.notes,
+    lineItems: invoice.lineItems.map((item) => ({
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: centsToDollars(item.unitPriceCents),
     })),
   };
 }

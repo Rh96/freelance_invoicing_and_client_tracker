@@ -4,6 +4,7 @@ import {
   previewLineTotal,
   previewTotals,
   toFormField,
+  toFormValues,
   toInvoiceInput,
   type InvoiceFormValues,
 } from "./invoice-form-schema";
@@ -109,5 +110,33 @@ describe("previewTotals", () => {
         Number.NaN,
       ),
     ).toEqual({ subtotalCents: 1000, taxCents: 0, totalCents: 1000 });
+  });
+});
+
+describe("toFormValues", () => {
+  it("round-trips with toInvoiceInput", () => {
+    const input = toInvoiceInput(invoiceFormSchema.parse(valid));
+    const invoice = {
+      ...input,
+      id: "i1",
+      number: "INV-0001",
+      status: "draft" as const,
+      lineItems: input.lineItems.map((item, i) => ({ ...item, id: `l${i}` })),
+      notes: input.notes ?? "",
+      createdAt: "2026-11-15T00:00:00.000Z",
+      updatedAt: "2026-11-15T00:00:00.000Z",
+      sentAt: null,
+      paidAt: null,
+    };
+    const values = toFormValues(invoice);
+    expect(values).toEqual({
+      clientId: "c1",
+      issueDate: "2026-11-15",
+      dueDate: "2026-12-15",
+      taxRatePercent: 8.25,
+      notes: "Thanks!",
+      lineItems: [{ description: "Design", quantity: 2, unitPrice: 0.29 }],
+    });
+    expect(toInvoiceInput(invoiceFormSchema.parse(values))).toEqual(input);
   });
 });
