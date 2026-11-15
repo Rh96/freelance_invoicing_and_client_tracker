@@ -85,6 +85,13 @@ export function ClientDetail({ id }: { id: string }) {
             <Link href={`/clients/${client.id}/edit`}>Edit</Link>
           </Button>
           {!archived && (
+            <Button asChild>
+              <Link href={`/invoices/new?clientId=${client.id}`}>
+                New invoice
+              </Link>
+            </Button>
+          )}
+          {!archived && (
             <ConfirmAction
               triggerLabel="Archive"
               title={`Archive ${client.name}?`}

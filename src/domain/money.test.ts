@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { formatMoney, invoiceTotals, lineTotalCents } from "./money";
+import {
+  basisPointsToPercent,
+  centsToDollars,
+  dollarsToCents,
+  formatMoney,
+  invoiceTotals,
+  lineTotalCents,
+  percentToBasisPoints,
+} from "./money";
 
 describe("lineTotalCents", () => {
   it("multiplies whole quantities", () => {
@@ -99,5 +107,37 @@ describe("formatMoney", () => {
 
   it("rejects fractional cents", () => {
     expect(() => formatMoney(1.5)).toThrow(RangeError);
+  });
+});
+
+describe("dollarsToCents / percentToBasisPoints", () => {
+  it.each([
+    [0, 0],
+    [19.99, 1999],
+    [0.29, 29], // 0.29 * 100 is 28.999999999999996 in floats
+    [1234.5, 123450],
+  ])("$%s → %s cents", (dollars, cents) => {
+    expect(dollarsToCents(dollars)).toBe(cents);
+  });
+
+  it.each([-1, 1.005, Number.NaN])("rejects %s dollars", (dollars) => {
+    expect(() => dollarsToCents(dollars)).toThrow(RangeError);
+  });
+
+  it.each([
+    [0, 0],
+    [8.25, 825],
+    [100, 10000],
+  ])("%s%% → %s bps", (percent, bps) => {
+    expect(percentToBasisPoints(percent)).toBe(bps);
+  });
+
+  it.each([-0.01, 100.01, 8.255])("rejects %s%%", (percent) => {
+    expect(() => percentToBasisPoints(percent)).toThrow(RangeError);
+  });
+
+  it("converts back for display", () => {
+    expect(basisPointsToPercent(825)).toBe(8.25);
+    expect(centsToDollars(1999)).toBe(19.99);
   });
 });

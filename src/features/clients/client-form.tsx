@@ -2,11 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
-import { useForm, type FieldError } from "react-hook-form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FormField } from "@/components/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { isRepositoryError } from "@/data/repository";
 import {
@@ -99,7 +99,7 @@ export function ClientForm({
         </p>
       )}
 
-      <Field id="client-name" label="Name" required error={errors.name}>
+      <FormField id="client-name" label="Name" required error={errors.name}>
         {(aria) => (
           <Input
             id="client-name"
@@ -108,9 +108,9 @@ export function ClientForm({
             {...register("name")}
           />
         )}
-      </Field>
+      </FormField>
 
-      <Field id="client-email" label="Email" required error={errors.email}>
+      <FormField id="client-email" label="Email" required error={errors.email}>
         {(aria) => (
           <Input
             id="client-email"
@@ -120,9 +120,9 @@ export function ClientForm({
             {...register("email")}
           />
         )}
-      </Field>
+      </FormField>
 
-      <Field id="client-company" label="Company" error={errors.company}>
+      <FormField id="client-company" label="Company" error={errors.company}>
         {(aria) => (
           <Input
             id="client-company"
@@ -131,9 +131,9 @@ export function ClientForm({
             {...register("company")}
           />
         )}
-      </Field>
+      </FormField>
 
-      <Field
+      <FormField
         id="client-address"
         label="Address"
         hint="Shown under “Bill to” on printed invoices."
@@ -148,7 +148,7 @@ export function ClientForm({
             {...register("address")}
           />
         )}
-      </Field>
+      </FormField>
 
       <div className="flex gap-2">
         <Button type="submit" disabled={isSubmitting}>
@@ -159,55 +159,5 @@ export function ClientForm({
         </Button>
       </div>
     </form>
-  );
-}
-
-type AriaProps = {
-  "aria-invalid": boolean;
-  "aria-required"?: boolean;
-  "aria-describedby"?: string;
-};
-
-function Field({
-  id,
-  label,
-  required = false,
-  hint,
-  error,
-  children,
-}: {
-  id: string;
-  label: string;
-  required?: boolean;
-  hint?: string;
-  error?: FieldError;
-  children: (aria: AriaProps) => ReactNode;
-}) {
-  const hintId = hint ? `${id}-hint` : undefined;
-  const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [errorId, hintId].filter(Boolean).join(" ") || undefined;
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>
-        {label}
-        {required && <span aria-hidden="true">*</span>}
-      </Label>
-      {children({
-        "aria-invalid": Boolean(error),
-        "aria-required": required || undefined,
-        "aria-describedby": describedBy,
-      })}
-      {hint && (
-        <p id={hintId} className="text-sm text-muted-foreground">
-          {hint}
-        </p>
-      )}
-      {error && (
-        <p id={errorId} className="text-sm text-destructive">
-          {error.message}
-        </p>
-      )}
-    </div>
   );
 }

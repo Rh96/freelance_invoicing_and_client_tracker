@@ -84,6 +84,20 @@ describe("ClientDetail", () => {
     );
   });
 
+  it("offers New invoice for this client only while active", async () => {
+    const user = userEvent.setup();
+    const { repository, maya } = await setup();
+    renderWithProviders(<ClientDetail id={maya.id} />, { repository });
+
+    expect(
+      await screen.findByRole("link", { name: "New invoice" }),
+    ).toHaveAttribute("href", `/invoices/new?clientId=${maya.id}`);
+    await user.click(screen.getByRole("button", { name: "Archive" }));
+    await user.click(screen.getByRole("button", { name: "Archive client" }));
+    await screen.findByText(/^Archived on /);
+    expect(screen.queryByRole("link", { name: "New invoice" })).toBeNull();
+  });
+
   it("archives after confirmation and shows the archived state", async () => {
     const user = userEvent.setup();
     const { repository, maya } = await setup();
