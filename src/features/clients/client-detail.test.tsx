@@ -73,6 +73,9 @@ describe("ClientDetail", () => {
     expect(within(rows[1]!).getByText("Overdue")).toBeInTheDocument();
     expect(within(rows[1]!).getByText("$1,100.00")).toBeInTheDocument(); // $1,000 + 10% tax
     expect(within(rows[0]!).getByText("Draft")).toBeInTheDocument();
+    expect(
+      within(rows[0]!).getByRole("link", { name: "INV-0002" }),
+    ).toHaveAttribute("href", expect.stringMatching(/^\/invoices\/[^/]+$/));
   });
 
   it("links to the edit page", async () => {

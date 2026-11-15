@@ -195,8 +195,14 @@ function InvoiceTable({
                 const client = clientsById.get(invoice.clientId);
                 return (
                   <tr key={invoice.id} className="border-b last:border-0">
-                    {/* TBD (T12): link to the invoice page */}
-                    <td className="px-3 py-2 font-medium">{invoice.number}</td>
+                    <td className="px-3 py-2 font-medium">
+                      <Link
+                        href={`/invoices/${invoice.id}`}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {invoice.number}
+                      </Link>
+                    </td>
                     <td className="px-3 py-2">
                       {client ? (
                         <Link

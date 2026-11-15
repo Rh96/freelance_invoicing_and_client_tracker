@@ -19,3 +19,13 @@ export function useCreateInvoice() {
     onSuccess: onSaved,
   });
 }
+
+export function useUpdateInvoice() {
+  const repository = useRepository();
+  const onSaved = useOnInvoiceSaved();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: InvoiceInput }) =>
+      repository.updateInvoice(id, input),
+    onSuccess: onSaved,
+  });
+}

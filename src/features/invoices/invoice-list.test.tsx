@@ -73,6 +73,13 @@ describe("InvoiceList", () => {
     ).toHaveAttribute("href", expect.stringMatching(/^\/clients\/[^/]+$/));
   });
 
+  it("links each number to its invoice page", async () => {
+    renderWithProviders(<InvoiceList />, { repository: await seed() });
+    expect(
+      await screen.findByRole("link", { name: "INV-0002" }),
+    ).toHaveAttribute("href", expect.stringMatching(/^\/invoices\/[^/]+$/));
+  });
+
   it("shows counts per status and filters by the chosen one", async () => {
     const user = userEvent.setup();
     renderWithProviders(<InvoiceList />, { repository: await seed() });

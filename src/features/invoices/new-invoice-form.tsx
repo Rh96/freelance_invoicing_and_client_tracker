@@ -108,7 +108,7 @@ function LoadedNewInvoiceForm({
       onSubmit={async (input) => {
         const invoice = await createInvoice.mutateAsync(input);
         showFlash(`${invoice.number} saved as draft.`);
-        router.push("/invoices"); // TBD (T12): go to the invoice page instead
+        router.push(`/invoices/${invoice.id}`);
       }}
     />
   );
