@@ -33,9 +33,9 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
 - [x] **T7 — Client list with search**
   - Acceptance: list from `useClients`; search via Zustand (name, company, email); loading skeleton, empty, no-results, error + Retry states; component tests for each state.
   - Notes: S1. Done 2026-11-15. Added `zustand@~5.0.16` (5.1.0 was 9 days old). Archived clients hidden; names become links in T9; "New client" button in T8.
-- [ ] **T8 — Create and edit client**
+- [x] **T8 — Create and edit client**
   - Acceptance: shared RHF + Zod form with labelled inputs and field errors; create and edit mutations invalidate caches; pending and failure states keep input. Component test for validation.
-  - Notes: S1. Fields: name, email, company, address (schema in `src/domain/client.ts`).
+  - Notes: S1, ADR-012. Fields: name, email, company, address (schema in `src/domain/client.ts`). Done 2026-11-15. Added `react-hook-form@~7.91.0`, `@hookform/resolvers@^5.9.2`. After saving, returns to `/clients` with a message; switch to the detail page in T9.
 - [ ] **T9 — Client detail and archive**
   - Acceptance: detail page lists the client's invoices; archive behind an accessible confirm dialog; archived clients hidden by default with a "Show archived" toggle and excluded from the invoice client picker.
   - Notes: S1.
@@ -83,6 +83,8 @@ This file is the source of truth; the GitHub Project board mirrors it (see the e
   - Acceptance: README with live link, screenshots, stack-to-skill table, key decisions (ADR-002…005), "Reset demo data" note, and the documented path for DB + auth.
 
 ## Later / parked
+
+- Smaller validation bundle: Zod (~33 kB gzipped) loads on every page because the repository validates stored data and lives in the root providers. Try `zod/mini` for the store schemas (measured in T8).
 
 - Real database via route handlers + hosted Postgres — after MVP (ADR-002).
 - Authentication — documented extension after MVP.

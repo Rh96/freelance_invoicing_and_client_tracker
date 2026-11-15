@@ -64,8 +64,8 @@ Paid → Sent exists only to undo a mistaken "Mark as paid". Sent never returns 
 ### 2. Create a client
 
 1. Clients → **New client** → fill form (Zod validation on blur and submit).
-2. Submit → `createClient` mutation (button pending) → invalidate `['clients']` → navigate to client detail with a success toast.
-3. On failure: input is kept, error message shown, submit can be retried.
+2. Submit → `createClient` mutation (button shows "Saving…") → invalidate `['clients']` → back to `/clients` with "Jane Doe added." announced. Editing works the same from **Edit** on a row. (From T9: go to the client detail page instead.)
+3. On failure: input is kept and an error is shown; field errors from the data layer appear under their field, which gets focus.
 
 ### 3. Create and send an invoice
 

@@ -100,3 +100,12 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** Init with `--base radix`. Replace `cn` with the approved `clsx` + `tailwind-merge` in `src/lib/utils.ts`. Drop the `shadcn/tailwind.css` import and the `shadcn` dev dependency, because the generated components only use Tailwind's built-in `data-[state=…]` variants and `tw-animate-css`. Keep dark mode on `prefers-color-scheme`. Error simulation has three modes (`writes`, `all`, `off`), read from the URL and remembered for the tab in sessionStorage, because in-app links drop the query string. React Query never retries.
 - **Alternatives considered:** accepting shadcn's defaults (an unapproved, 2-week-old pre-1.0 dependency and a dev dependency that pulls in the whole CLI); a random failure rate (hard to demo reliably); a visible toggle in the UI (clutters the demo for normal visitors).
 - **Consequences:** Future `shadcn add` runs will generate `import { cn } from "cn"` and may need `shadcn/tailwind.css` variants such as `data-open:`; each new component needs its import fixed and a check for those variants. Revisit `cn` once it reaches 1.0.
+
+## ADR-012: Form validation timing and feedback after saving
+
+- **Date:** 2026-11-15
+- **Status:** Accepted
+- **Context:** The client form (T8) needed a validation timing and a way to confirm a save. APP_FLOW planned "go to the client detail page with a toast", but detail pages come in T9, and a toast library would be another dependency.
+- **Decision:** React Hook Form validates on blur, then on every change once a field has been touched (`mode: "onTouched"`), and on submit; errors are linked with `aria-describedby` and focus moves to the first invalid field. After saving, the app returns to `/clients` and shows a one-time message ("Jane Doe added.") from a small Zustand store. The message is rendered into an already-present `aria-live` region one frame after mount, so screen readers announce it.
+- **Alternatives considered:** validating on every keystroke from the start (errors appear while the user is still typing); a toast library such as sonner (one more dependency for one message); the message in the URL (`?added=…` survives reloads and can be spoofed with arbitrary text).
+- **Consequences:** No new UI dependency. T9 switches the destination to the client detail page; `FlashMessage` can be reused on any page.
