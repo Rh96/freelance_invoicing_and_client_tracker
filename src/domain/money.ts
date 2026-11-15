@@ -30,9 +30,18 @@ function assertNonNegativeInteger(value: number, name: string): void {
   }
 }
 
+/** True when `value` has at most 2 decimals. Shared by the money math and the Zod schemas. */
+export function hasAtMostTwoDecimals(value: number): boolean {
+  // Tolerance absorbs float noise (1.15 * 100 is 114.99999999999999); anything larger is a 3rd decimal.
+  return (
+    Number.isFinite(value) &&
+    Math.abs(value * 100 - Math.round(value * 100)) <= 1e-6
+  );
+}
+
 /**
  * Converts a quantity with up to 2 decimals to an integer count of hundredths,
- * so the rest of the math stays in integers (1.15 * 100 is 114.99999999999999 in floats).
+ * so the rest of the math stays in integers.
  */
 function quantityToHundredths(quantity: number): number {
   if (!Number.isFinite(quantity) || quantity < 0) {
@@ -40,14 +49,12 @@ function quantityToHundredths(quantity: number): number {
       `quantity must be a non-negative number, got ${quantity}`,
     );
   }
-  const hundredths = Math.round(quantity * 100);
-  // Tolerance absorbs float noise; anything larger means a 3rd decimal was entered.
-  if (Math.abs(quantity * 100 - hundredths) > 1e-6) {
+  if (!hasAtMostTwoDecimals(quantity)) {
     throw new RangeError(
       `quantity supports at most 2 decimals, got ${quantity}`,
     );
   }
-  return hundredths;
+  return Math.round(quantity * 100);
 }
 
 export function lineTotalCents({
