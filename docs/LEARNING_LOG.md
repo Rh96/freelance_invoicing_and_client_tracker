@@ -92,3 +92,12 @@ The agent appends one entry after every completed task. Read it weekly; turn "St
 - **What went wrong / AI got wrong:** an edge case surfaced while planning: if every client is archived, the old "No clients yet" check would hide the toggle needed to see them; the list now says "All clients are archived" and keeps the toggle (tested). One mutation check silently didn't apply because Prettier had reformatted the target line; I re-ran it against the formatted code and confirmed the test catches it.
 - **Study next:** "Rule of three" vs premature abstraction; WCAG 1.4.1 "Use of Color".
 - **Interview angle:** "I extracted the confirm dialog only when the second use arrived, and proved the refactor safe by running the original component's tests unchanged."
+
+## 2026-11-15 — T10: Invoice list with status filter
+
+- **Built:** `/invoices` with a status filter (All, Draft, Sent, Overdue, Paid, each with a count) and a table (number, client link, issued, due, total, status); `filterInvoices()` and `countByStatus()`; a Zustand store for the chosen status; loading, empty, no-match with "Show all", error + Retry and corrupt-data states; 15 tests.
+- **Concepts used:** native radio groups for single-choice filters (arrow keys and screen-reader semantics for free), `peer-checked` / `peer-focus-visible` styling with visually hidden inputs, combining two queries' states, mutually exclusive derived statuses, Next 16 prerendering under `cacheComponents` and "unstable values" like `new Date()`.
+- **Why this approach:** a radio group needs no custom keyboard code, unlike a hand-built tab bar or toggle-button group. Keeping Sent and Overdue exclusive means each invoice appears under exactly one filter and the counts add up, which matches the badges.
+- **What went wrong / AI got wrong:** all 189 tests passed, but `next build` failed: the list read `new Date()` during prerender of the static `/invoices` route, which `cacheComponents` rejects because the date would be frozen at build time. Tests don't prerender, so only the build could catch it. The fix moves the table, and the clock read, into a child rendered only after data loads. I added the rule to ARCHITECTURE conventions.
+- **Study next:** Next.js prerendering and `cacheComponents` "blocking-prerender" errors (nextjs.org/docs/messages/blocking-prerender-current-time-client); the WAI-ARIA radio group pattern.
+- **Interview angle:** "My tests were green but the production build failed on a date read during prerender. That's why CI runs the real build, not just tests."

@@ -130,6 +130,7 @@ As a portfolio reviewer, I want the app pre-filled with realistic data so that I
 - Currency USD, locale `en-US` (ADR-008).
 - Client fields: name and email (required, email validated), company and address (optional). The address is used for "Bill to" on the printed invoice.
 - Drafts may have zero line items; totals show $0.00.
+- The invoice list's status filters match the badges and don't overlap: "Sent" means sent and not yet past due; overdue invoices are only under "Overdue". Counts add up to "All".
 
 ## Open questions
 
