@@ -146,3 +146,12 @@ The agent appends one entry after every completed task. Read it weekly; turn "St
 - **What went wrong / AI got wrong:** deleting `src/features/dashboard/.gitkeep` with `git rm` also removed the now-empty folder, so my next heredoc writes failed with "No such file or directory"; I recreated the folder. The T1 smoke test for `/` broke because the page now needs providers. I also took the first real-browser screenshots (desktop light, 390px dark) with headless Chrome to confirm the layout. The tests can't show that.
 - **Study next:** dashboard design basics (what belongs above the fold); `Intl.PluralRules` for proper pluralisation beyond English.
 - **Interview angle:** "The dashboard is just pure functions over the cached invoice list, so it's trivially testable and stays consistent with every other screen without extra fetching."
+
+## 2026-11-15 — T16: Recent activity
+
+- **Built:** a "Recent activity" section on the dashboard listing the latest 10 events ("INV-0007 sent to Omar Haddad · 3 days ago"), each linked to its invoice and client, with the exact time in a tooltip; pure `buildActivity()` in `src/domain/activity.ts`; `formatRelativeTime()` and `formatDateTime()`; 19 tests.
+- **Concepts used:** deriving an event feed from existing timestamps (no event log, ADR-005), discriminated unions for event types with an exhaustive `switch`, multi-key stable sorting (time, lifecycle step, id), `Intl.RelativeTimeFormat` with `numeric: "auto"` ("yesterday", "last week"), `<time dateTime>` for machine-readable times.
+- **Why this approach:** the feed costs no extra storage and can't disagree with the records; the trade-off (no history of reversals, so an undone payment's "paid" event disappears) was accepted in ADR-005 and is tested.
+- **What went wrong / AI got wrong:** a mutation check survived: deleting my explicit "under 60 seconds → just now" branch changed nothing, because the fallback at the end already returned "just now", and my comment had wrongly called that fallback unreachable. I removed the redundant branch and fixed the comment. Another mutation check didn't apply at first because Prettier had split the line; I re-ran it against the formatted code.
+- **Study next:** `Intl.RelativeTimeFormat` and `Intl.DateTimeFormat` options; event sourcing vs deriving state from snapshots (what an activity log would add, and cost).
+- **Interview angle:** "A mutation test showed one of my branches was dead code. The test suite was fine; the code was redundant, so I deleted it."
