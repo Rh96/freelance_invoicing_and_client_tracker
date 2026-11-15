@@ -89,6 +89,24 @@ describe("Dashboard", () => {
     ).toHaveAttribute("href", `/clients/${maya.id}`);
   });
 
+  it("shows the latest 10 events with links and relative times", async () => {
+    const { repository, mostOverdue } = await seed();
+    renderWithProviders(<Dashboard />, { repository });
+
+    const section = (
+      await screen.findByRole("heading", { name: "Recent activity" })
+    ).closest("section")!;
+    const items = within(section).getAllByRole("listitem");
+    // 2 clients + 5 created + 4 sent + 1 paid = 12 events; only the latest 10 show.
+    expect(items).toHaveLength(10);
+    // Test data is created within the same moment, so everything is "just now".
+    expect(within(items[0]!).getByText("just now")).toHaveAttribute("dateTime");
+    expect(
+      within(section).getAllByRole("link", { name: "INV-0004" })[0],
+    ).toHaveAttribute("href", `/invoices/${mostOverdue.id}`);
+    expect(section).toHaveTextContent("INV-0001 paid by Maya Chen");
+  });
+
   it("says when nothing is overdue", async () => {
     const repository = testRepository();
     const c = await repository.createClient({
@@ -170,5 +188,11 @@ describe("Dashboard", () => {
       .getByRole("heading", { name: "Overdue" })
       .closest("section")!;
     expect(section).toHaveTextContent("1 overdue · $200.00");
+    const activity = screen
+      .getByRole("heading", { name: "Recent activity" })
+      .closest("section")!;
+    expect(within(activity).getAllByRole("listitem")[0]).toHaveTextContent(
+      "INV-0004 paid by Maya Chen",
+    );
   });
 });

@@ -11,6 +11,7 @@ import { formatMoney } from "@/domain/money";
 import { useClients } from "@/features/clients/queries";
 import { useInvoices } from "@/features/invoices/queries";
 import { moneySummary, overdueInvoices } from "./dashboard-stats";
+import { RecentActivity } from "./recent-activity";
 
 export function Dashboard() {
   const invoicesQuery = useInvoices();
@@ -97,7 +98,8 @@ function DashboardContent({
   invoices: readonly Invoice[];
   clients: readonly Client[];
 }) {
-  const today = toIsoDate(new Date());
+  const now = new Date();
+  const today = toIsoDate(now);
   const summary = useMemo(() => moneySummary(invoices), [invoices]);
   const overdue = useMemo(
     () => overdueInvoices(invoices, today),
@@ -185,6 +187,8 @@ function DashboardContent({
           </ul>
         )}
       </section>
+
+      <RecentActivity clients={clients} invoices={invoices} now={now} />
     </div>
   );
 }
