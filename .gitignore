@@ -43,3 +43,7 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# project docs and agent notes: kept locally, not published
+/docs/
+/AGENTS.md

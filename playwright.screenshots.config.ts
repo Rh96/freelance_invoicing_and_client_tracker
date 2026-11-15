@@ -3,7 +3,7 @@ import base from "./playwright.config";
 
 /**
  * README screenshots (`npm run build && npm run screenshots`). Not part of CI:
- * it writes images to docs/screenshots instead of asserting anything.
+ * it writes images to .github/screenshots instead of asserting anything.
  */
 export default defineConfig({
   ...base,
