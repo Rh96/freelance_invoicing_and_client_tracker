@@ -136,3 +136,12 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** `/invoices/[id]/print` stays inside the shell. On screen it shows a Back link, a "Print / Save as PDF" button and the invoice document; when printing, Tailwind's `print:hidden` removes the shell and toolbar, and a `@media print` block forces light colors (so a dark OS theme still prints black on white) and sets `@page` margins. The business shown is fictional ("Harbor & Pine Studio", `.example` email), because the demo is public.
 - **Alternatives considered:** a route group with its own layout so the print page has no shell even on screen (cleaner preview, but it moves every route file); a PDF library (a dependency, and the browser already does this well).
 - **Consequences:** The print preview on screen still shows the app header. Print layout can't be tested in jsdom; it was verified with headless Chrome (one Letter page for 15 lines, light and dark), and T17 will automate that check.
+
+## ADR-016: End-to-end tests with Playwright against the production build
+
+- **Date:** 2026-11-15
+- **Status:** Accepted
+- **Context:** Several behaviours can't be proven in jsdom: print layout, real timing between saves, Next's route preservation, and the production build itself. T17 asks for one end-to-end flow in CI.
+- **Decision:** `@playwright/test@~1.64.1` (1.65 was 10 days old) with `channel: "chrome"`, the installed Google Chrome, which GitHub's Ubuntu runners preinstall, so there's no browser download. Tests run against `next start` after `next build`, in a second CI job that runs after lint/type check/unit tests/build pass, and upload the report and traces on failure. Specs: the core flow, the one-page print check (light and dark), the optimistic rollback, and the edit confirmation on a preserved page.
+- **Alternatives considered:** Playwright's bundled Chromium (about 150 MB download locally and in CI); running against `next dev` (faster startup, but not what users get, and dev-only behaviour like Strict Mode double effects); Cypress (heavier, and Playwright's `page.pdf()` covers the print check).
+- **Consequences:** Results depend on the runner's Chrome version moving over time. The e2e job adds about a minute to CI. Selectors must account for Next's hidden preserved pages and its `role="alert"` route announcer.
