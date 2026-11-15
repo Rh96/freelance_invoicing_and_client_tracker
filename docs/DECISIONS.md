@@ -91,3 +91,12 @@ One entry per significant technical or product choice. Newest at the bottom. Nev
 - **Decision:** `createSeedStore({ now })` builds the demo data with every date and timestamp relative to `now`. The repository takes it as `initialData`, saves it on the first read so ids stay stable across reloads, and `resetData()` writes a fresh one without reading the old data, which also recovers from corrupt storage. `resetData()` is part of the `Repository` interface.
 - **Alternatives considered:** fixed dates (every Sent invoice slowly turns overdue and the dashboard ages); seeding outside the repository in app code (two places that know about first-visit logic); a separate demo-only reset service (the UI would need a second dependency for one button).
 - **Consequences:** A returning visitor keeps the dates from their first visit, so their data ages until they reset; acceptable for a demo. A real backend would implement `resetData()` as "delete my data" or not offer it.
+
+## ADR-011: shadcn/ui setup and demo error simulation
+
+- **Date:** 2026-11-15
+- **Status:** Accepted
+- **Context:** `shadcn init` (4.23) defaults to Base UI instead of Radix, installed its new pre-1.0 `cn` package instead of `clsx` + `tailwind-merge`, added the `shadcn` CLI as a dev dependency for one CSS import, and switched dark mode to a `.dark` class. None of that matched what was approved in ADR-001. Separately, the `?simulateErrors` switch from ADR-002 needed concrete behaviour.
+- **Decision:** Init with `--base radix`. Replace `cn` with the approved `clsx` + `tailwind-merge` in `src/lib/utils.ts`. Drop the `shadcn/tailwind.css` import and the `shadcn` dev dependency, because the generated components only use Tailwind's built-in `data-[state=…]` variants and `tw-animate-css`. Keep dark mode on `prefers-color-scheme`. Error simulation has three modes (`writes`, `all`, `off`), read from the URL and remembered for the tab in sessionStorage, because in-app links drop the query string. React Query never retries.
+- **Alternatives considered:** accepting shadcn's defaults (an unapproved, 2-week-old pre-1.0 dependency and a dev dependency that pulls in the whole CLI); a random failure rate (hard to demo reliably); a visible toggle in the UI (clutters the demo for normal visitors).
+- **Consequences:** Future `shadcn add` runs will generate `import { cn } from "cn"` and may need `shadcn/tailwind.css` variants such as `data-open:`; each new component needs its import fixed and a check for those variants. Revisit `cn` once it reaches 1.0.

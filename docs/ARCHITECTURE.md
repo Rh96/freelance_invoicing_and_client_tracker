@@ -23,6 +23,9 @@
 ```
 src/
   app/                    # routes and layouts only; thin, delegates to features
+    layout.tsx            # html shell: Providers + AppShell
+    providers.tsx         # QueryClient + RepositoryProvider (seeded, error simulation)
+    error.tsx, global-error.tsx, not-found.tsx
     page.tsx              # dashboard
     clients/              # list, new, [id], [id]/edit
     invoices/             # list, new, [id], [id]/edit, [id]/print
@@ -31,9 +34,12 @@ src/
     invoices/             # components, queries, form
     dashboard/            # components, selectors (derived stats)
   domain/                 # pure logic + Zod schemas: money, invoice-status, client, invoice, activity (+ tests)
-  data/                   # repository.ts (interface), local-storage-repository.ts, seed.ts
+  data/                   # repository.ts (interface), local-storage-repository.ts, seed.ts,
+                          # repository-context.tsx (useRepository), simulate-errors.ts
   stores/                 # Zustand UI stores
-  components/ui/          # shadcn/ui generated components
+  components/             # app-shell, app-nav, reset-demo-data-button
+  components/ui/          # shadcn/ui generated components (Radix base)
+  lib/utils.ts            # cn() = clsx + tailwind-merge
   config/business.ts      # business name, address, invoice prefix, currency/locale
 e2e/                      # Playwright specs
 ```
@@ -59,7 +65,9 @@ Component → TanStack Query hook (features/*/queries) → Repository (async) �
 - **Form state** (the invoice/client draft): owned by React Hook Form; live totals computed from `watch`ed line items via `domain/money.ts`.
 - **UI state** (search text, status filter, open dialogs): Zustand.
 - **Derived state** (totals, overdue, dashboard stats, activity): pure functions in `domain/`, called in `select` or components; never cached separately.
-- **Repository** simulates 200–600 ms latency. Failure injection is switchable (`?simulateErrors=1` or a dev toggle) to demo error states.
+- **Repository** simulates 200–600 ms latency. Failure injection: `?simulateErrors=writes` (saves fail), `?simulateErrors=all` (everything fails), `?simulateErrors=off`; remembered per tab in sessionStorage (ADR-011).
+- **Query defaults:** no retries (storage is local, so a retry can't help and would hide simulated errors), `staleTime` 30 s.
+- **Theme:** dark mode follows the OS (`prefers-color-scheme`); no toggle in v1.
 - **Demo seed:** `createSeedStore()` (`src/data/seed.ts`) builds 5 clients (1 archived) and 8 invoices with dates relative to today. The app passes it as the repository's `initialData`; it's saved on the first read, and `resetData()` restores a fresh one (ADR-010).
 
 See [APP_FLOW.md](APP_FLOW.md) for screens, flows and diagrams.

@@ -56,3 +56,12 @@ The agent appends one entry after every completed task. Read it weekly; turn "St
 - **What went wrong / AI got wrong:** the seed first built invoice numbers by hand (`INV-` + padding), duplicating the repository's rule; it now reuses the exported `formatInvoiceNumber`. Mutation checks confirmed tests catch three regressions: not saving the seed, fixed instead of relative dates, and a reset that reads corrupt data first.
 - **Study next:** date handling without libraries (`Date.UTC`, local vs UTC calendar dates) and when to reach for Temporal; test fixtures vs factories.
 - **Interview angle:** "The demo data is generated relative to today and tested at two different dates, so the live demo never goes stale."
+
+## 2026-11-15 — T6: App shell and providers
+
+- **Built:** React Query and repository providers (`src/app/providers.tsx`, `src/data/repository-context.tsx`), the app shell with skip link, landmarks and active nav (`src/components/app-shell.tsx`, `app-nav.tsx`), error, global-error and not-found pages, the "Reset demo data" confirm dialog, the `?simulateErrors` switch, shadcn/ui (Radix) with `button` and `alert-dialog`, and 29 tests.
+- **Concepts used:** React context for dependency injection, `QueryClient` defaults, Next 16 error boundaries (`retry` prop), `cacheComponents` and why `usePathname` needs a `<Suspense>` boundary, `aria-current`, skip links, landmarks (`banner`, `main`, `contentinfo`), controlled Radix dialogs, `role="status"` live regions.
+- **Why this approach:** the repository comes from context, so tests pass a fake and a future API-backed repository needs no component changes. The reset dialog is controlled so it stays open, with an error, if the reset fails, instead of closing and losing the message.
+- **What went wrong / AI got wrong:** `shadcn init` silently changed four things: Base UI by default, a new `cn` package, the `shadcn` CLI as a dependency, and class-based dark mode. I caught it by diffing `package.json` and `globals.css` after the run and reverted to the approved setup (ADR-011). Next 16 renamed the error boundary prop from `reset` to `retry`; I took that from the bundled docs instead of memory.
+- **Study next:** WAI-ARIA landmarks and the alert dialog pattern (w3.org/WAI/ARIA/apg/patterns/alertdialog); React Query's `QueryClient` defaults and `invalidateQueries`.
+- **Interview angle:** "I treat code generators like dependencies: I diff what they change. shadcn quietly swapped in an unapproved package, and I caught it before it shipped."
