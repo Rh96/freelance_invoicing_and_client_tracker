@@ -32,7 +32,7 @@ src/
   features/
     clients/              # components, queries (TanStack hooks), form
     invoices/             # components, queries, form
-    dashboard/            # components, selectors (derived stats)
+    dashboard/            # dashboard, dashboard-stats (moneySummary, overdueInvoices; pure, tested)
   domain/                 # pure logic + Zod schemas: money, invoice-status, client, invoice, activity (+ tests)
   data/                   # repository.ts (interface), local-storage-repository.ts, seed.ts,
                           # repository-context.tsx (useRepository), simulate-errors.ts
